@@ -3,8 +3,9 @@
 #include <algorithm>
 #include <iostream>
 
-Maze::Maze(int height, int width, int straightRate)
-    : width(width + 2), height(height + 2), straightRate(straightRate) {
+Maze::Maze(int height, int width, int straightRate, int density)
+    : width(width + 2), height(height + 2), straightRate(straightRate),
+      density(density) {
   this->map.resize(this->height);
   this->directions = {{{0, -1}, {1, 0}, {0, 1}, {-1, 0}}};
 
@@ -31,18 +32,18 @@ void Maze::backtrackPath(int posX, int posY, int dirX, int dirY) {
   MazeElement &me = this->map[posY][posX];
   std::vector<int> dirIds;
   bool toContinue = false;
+  bool changeDir;
+  int dirIdx;
 
   this->map[posY][posX].value = Entity::Empty;
   do {
+    changeDir = true;
     dirIds.clear();
     dirIds.reserve(4);
     me.dir = 0;
     for (int i = 0; i < 4; ++i) {
-      int dir = this->getDirection(dirX, dirY);
-
       int nposX = posX + this->directions[i].x;
       int nposY = posY + this->directions[i].y;
-
       if (nposX <= 0 || nposX >= this->width - 1 || nposY <= 0 ||
           nposY >= this->height - 1) { // if out of the map
         continue;
@@ -68,21 +69,76 @@ void Maze::backtrackPath(int posX, int posY, int dirX, int dirY) {
     }
     if (me.dir == 0)
       return;
-    int dirIdx = this->choseDirection(dirIds);
-
-    dirX = this->directions[dirIdx].x;
-    dirY = this->directions[dirIdx].y;
-    backtrackPath(posX + dirX, posY + dirY, dirX, dirY);
+    dirIdx = this->getDirection(dirX, dirY);
+    for (const auto &dir : dirIds) {
+      if (dirIdx == dir)
+        changeDir = false;
+    }
+    if (changeDir == false && std::rand() % 100 < straightRate) {
+      this->backtrackPath(posX + dirX, posY + dirY, dirX, dirY);
+    } else {
+      dirIdx = this->choseDirection(dirIds);
+      int ndirX = this->directions[dirIdx].x;
+      int ndirY = this->directions[dirIdx].y;
+      this->backtrackPath(posX + ndirX, posY + ndirY, ndirX, ndirY);
+    }
     me.dir ^= (1 >> dirIdx);
   } while (me.dir > 0);
 }
 
-const std::vector<std::vector<Maze::MazeElement>> &Maze::getMap() const {
-  return this->map;
+bool Maze::findClosestElem(int &posX, int &posY, Entity ent) const {
+  if (this->map[posY][posX].value == ent) {
+    return true;
+  } else {
+    for (int radius = 1;
+         (radius < this->width - 2 || radius < this->height - 2); ++radius) {
+      int tmpX = posX - radius;
+      int tmpY = posY - radius;
+
+      for (int tmpY = std::max(posY - radius, 1); tmpY <= posY + radius;
+           ++tmpY) {
+        if (tmpY >= this->height - 1)
+          break;
+        for (int tmpX = std::max(posX - radius, 1); tmpX <= posX + radius;
+             ++tmpX) {
+          if (tmpX >= this->width - 1)
+            break;
+          if (this->map[tmpY][tmpX].value == ent) {
+            posX = tmpX;
+            posY = tmpY;
+            return true;
+          }
+        }
+      }
+    }
+  }
+  return false;
+}
+
+void Maze::removeWalls() {
+  int nbWall = (this->height * this->width) / 2;
+  int toRemove = (nbWall * (100 - density)) / 250;
+  int posX;
+  int posY;
+
+  for (int i = 0; i < toRemove; ++i) {
+    posX = 1 + std::rand() % (this->width - 2); // Minus size of the border
+    posY = 1 + std::rand() % (this->height - 2);
+
+    if (findClosestElem(posX, posY, Entity::Wall) == true) {
+      this->map[posY][posX].value = Entity::Empty;
+    } else
+      break;
+  }
 }
 
 void Maze::generate(unsigned int seed) {
   std::srand(seed);
 
   this->backtrackPath(1, 1, 1, 0);
+  this->removeWalls();
+}
+
+const std::vector<std::vector<Maze::MazeElement>> &Maze::getMap() const {
+  return this->map;
 }

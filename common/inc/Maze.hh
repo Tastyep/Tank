@@ -21,7 +21,7 @@ public:
   };
 
 public:
-  Maze(int height, int width, int straightRate = 50);
+  Maze(int height, int width, int straightRate = 50, int density = 80);
 
   ~Maze() = default;
   Maze(const Maze &other) = default;
@@ -36,12 +36,15 @@ private:
   void backtrackPath(int posX, int posY, int dirX, int dirY);
   int choseDirection(const std::vector<int> &dirIds) const;
   int getDirection(int dirX, int dirY) const;
+  void removeWalls();
+  bool findClosestElem(int &posX, int &posY, Entity ent) const;
 
 private:
   std::vector<std::vector<MazeElement>> map;
   std::array<Direction, 4> directions;
   int width;
   int height;
+  int density;
   unsigned int straightRate;
 };
 

@@ -3,7 +3,7 @@
 #include <iostream>
 
 int main(int argc, char *argv[]) {
-  Maze m(20, 40, 80);
+  Maze m(15, 30, 30);
 
   m.generate(3);
   auto &map = m.getMap();
