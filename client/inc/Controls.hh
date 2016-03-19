@@ -62,20 +62,20 @@ struct Entry {
   };
 };
 
-typedef struct s_action {
+typedef struct ActionData {
   std::string code;
   actionType type;
   bool state;
 
-  s_action(const std::string &c, actionType t = actionType::Default)
+  ActionData(const std::string &c, actionType t = actionType::Default)
       : code(c), type(t), state(false) {}
 } t_action;
 
-struct s_mouseEvent {
+struct MouseEvent {
   sf::Mouse::Button button;
   sf::Vector2i position;
 
-  s_mouseEvent(sf::Mouse::Button b, const sf::Vector2i &p)
+  MouseEvent(sf::Mouse::Button b, const sf::Vector2i &p)
       : button(b), position(p) {}
 };
 
@@ -108,12 +108,12 @@ public:
 private:
   std::array<std::map<ctrl::key, bool>,
              static_cast<size_t>(ctrl::type::TypeCount)>
-      _keyState;
-  std::map<Action, std::array<Entry, 5>> _actionKeys;
-  std::map<std::string, Entry> _keycode;
-  std::vector<t_action> _actions;
+      keyState;
+  std::map<Action, std::array<Entry, 5>> actionKeys;
+  std::map<std::string, Entry> keycode;
+  std::vector<t_action> actions;
   std::array<sf::Vector2i, static_cast<int>(sf::Mouse::ButtonCount)>
-      _mousePosition;
+      mousePosition;
 };
 
 #endif /* _CONTROLS_H_ */
