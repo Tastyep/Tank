@@ -8,6 +8,7 @@ int main(int argc, char *argv[]) {
   parser.loadConfigFile("./config/config.cfg");
   ClientMain client(set);
 
+  client.loadMap();
   client.run();
   return 0;
 }

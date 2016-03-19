@@ -2,11 +2,13 @@
 #include "TimeHandling.hpp"
 
 ClientMain::ClientMain(const Settings &settings)
-    : settings(settings),
+    : settings(settings), tileManager(64), map(10, 10),
       window(sf::VideoMode(
                  std::stoi(this->settings.getCvarList().getCvar("r_width")),
                  std::stoi(this->settings.getCvarList().getCvar("r_height"))),
              "Tank") {}
+
+void ClientMain::loadMap() { this->map.generate(this->tileManager); }
 
 void ClientMain::run() {
   Controls &ctrl = settings.getControls();

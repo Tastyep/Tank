@@ -1,7 +1,7 @@
 #ifndef TANK_MAZE_HH
 #define TANK_MAZE_HH
 
-#include "Entity.hpp"
+#include "EntityId.hpp"
 
 #include <array>
 #include <vector>
@@ -9,10 +9,10 @@
 class Maze {
 public:
   struct MazeElement {
-    Entity value;
+    EntityId value;
     int dir;
 
-    MazeElement() : value(Entity::Wall), dir(0) {}
+    MazeElement() : value(EntityId::Wall), dir(0) {}
   };
 
   struct Direction {
@@ -31,13 +31,15 @@ public:
 
   void generate(unsigned int seed);
   const std::vector<std::vector<MazeElement>> &getMap() const;
+  int getWidth() const;
+  int getHeight() const;
 
 private:
   void backtrackPath(int posX, int posY, int dirX, int dirY);
   int choseDirection(const std::vector<int> &dirIds) const;
   int getDirection(int dirX, int dirY) const;
   void removeWalls();
-  bool findClosestElem(int &posX, int &posY, Entity ent) const;
+  bool findClosestElem(int &posX, int &posY, EntityId ent) const;
 
 private:
   std::vector<std::vector<MazeElement>> map;

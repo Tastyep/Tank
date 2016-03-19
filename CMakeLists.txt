@@ -28,7 +28,8 @@ file (GLOB sources "*.cpp")
 set (DIRS ${PROJECT_SOURCE_DIR}/${CLIENT_DIR}/inc
           ${PROJECT_SOURCE_DIR}/${COMMON_DIR}/inc
           ${PROJECT_SOURCE_DIR}/${CLIENT_DIR}/src
-          ${PROJECT_SOURCE_DIR}/${COMMON_DIR}/src)
+          ${PROJECT_SOURCE_DIR}/${COMMON_DIR}/src
+         ${PROJECT_SOURCE_DIR}/${COMMON_DIR}/src/Entities)
 
 foreach (dir ${DIRS})
    file (GLOB h_${dir} "${dir}/*.h")

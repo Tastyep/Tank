@@ -7,7 +7,7 @@ TileManager::TileManager(unsigned int tileSize) : tileSize(tileSize) {
   unsigned int nbTile = static_cast<unsigned int>(TileId::Last);
 
   std::shared_ptr<sf::Texture> gameTexture =
-      tm.load("./asset.png", "GameAssets");
+      tm.load("../client/assets/asset.png", "GameAssets");
   sf::Vector2u textureSize = gameTexture->getSize();
 
   this->gameTiles.reserve(nbTile);

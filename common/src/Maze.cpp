@@ -35,7 +35,7 @@ void Maze::backtrackPath(int posX, int posY, int dirX, int dirY) {
   bool changeDir;
   int dirIdx;
 
-  this->map[posY][posX].value = Entity::Empty;
+  this->map[posY][posX].value = EntityId::Empty;
   do {
     changeDir = true;
     dirIds.clear();
@@ -48,7 +48,7 @@ void Maze::backtrackPath(int posX, int posY, int dirX, int dirY) {
           nposY >= this->height - 1) { // if out of the map
         continue;
       }
-      if (this->map[nposY][nposX].value == Entity::Empty) {
+      if (this->map[nposY][nposX].value == EntityId::Empty) {
         continue;
       }
       toContinue = false;
@@ -57,7 +57,7 @@ void Maze::backtrackPath(int posX, int posY, int dirX, int dirY) {
           continue;
         if (this->map[nposY + this->directions[j].y]
                      [nposX + this->directions[j].x]
-                         .value == Entity::Empty) {
+                         .value == EntityId::Empty) {
           toContinue = true;
           break;
         }
@@ -87,7 +87,7 @@ void Maze::backtrackPath(int posX, int posY, int dirX, int dirY) {
   } while (me.dir > 0);
 }
 
-bool Maze::findClosestElem(int &posX, int &posY, Entity ent) const {
+bool Maze::findClosestElem(int &posX, int &posY, EntityId ent) const {
   if (this->map[posY][posX].value == ent) {
     return true;
   } else {
@@ -123,8 +123,8 @@ void Maze::removeWalls() {
     posX = 1 + std::rand() % (this->width - 2); // Minus size of the border
     posY = 1 + std::rand() % (this->height - 2);
 
-    if (findClosestElem(posX, posY, Entity::Wall) == true) {
-      this->map[posY][posX].value = Entity::Empty;
+    if (findClosestElem(posX, posY, EntityId::Wall) == true) {
+      this->map[posY][posX].value = EntityId::Empty;
     } else
       break;
   }
@@ -136,6 +136,9 @@ void Maze::generate(unsigned int seed) {
   this->backtrackPath(1, 1, 1, 0);
   this->removeWalls();
 }
+
+int Maze::getWidth() const { return this->width; }
+int Maze::getHeight() const { return this->height; }
 
 const std::vector<std::vector<Maze::MazeElement>> &Maze::getMap() const {
   return this->map;

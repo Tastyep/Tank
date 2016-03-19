@@ -1,7 +1,9 @@
 #ifndef TANK_CLIENTMAIN_HH
 #define TANK_CLIENTMAIN_HH
 
+#include "Map.hh"
 #include "Settings.hh"
+#include "TileManager.hh"
 
 #include <SFML/Graphics.hpp>
 
@@ -16,9 +18,12 @@ public:
   ClientMain &operator=(ClientMain &&other) = default;
 
   void run();
+  void loadMap();
 
 private:
   Settings settings;
+  TileManager tileManager;
+  Map map;
   sf::RenderWindow window;
 };
 

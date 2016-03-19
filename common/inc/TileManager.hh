@@ -1,10 +1,9 @@
 #ifndef TANK_TILEMANAGER_HH_
 #define TANK_TILEMANAGER_HH_
 
+#include "TileIds.hpp"
 #include <SFML/Graphics.hpp>
 #include <vector>
-
-enum class TileId { Wall = 0, Last };
 
 class TileManager {
 public:
