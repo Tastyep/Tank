@@ -4,8 +4,8 @@
 #include <iostream>
 
 Maze::Maze(int height, int width, int straightRate, int density)
-    : width(width + 2), height(height + 2), straightRate(straightRate),
-      density(density) {
+    : width(width + 2), height(height + 2), density(density),
+      straightRate(straightRate) {
   this->map.resize(this->height);
   this->directions = {{{0, -1}, {1, 0}, {0, 1}, {-1, 0}}};
 
@@ -52,8 +52,8 @@ void Maze::backtrackPath(int posX, int posY, int dirX, int dirY) {
         continue;
       }
       toContinue = false;
-      for (int j = 0; j < this->directions.size(); ++j) {
-        if (j == ((i + 2) % 4))
+      for (unsigned int j = 0; j < this->directions.size(); ++j) {
+        if (j == static_cast<unsigned int>((i + 2) % 4))
           continue;
         if (this->map[nposY + this->directions[j].y]
                      [nposX + this->directions[j].x]
@@ -74,7 +74,8 @@ void Maze::backtrackPath(int posX, int posY, int dirX, int dirY) {
       if (dirIdx == dir)
         changeDir = false;
     }
-    if (changeDir == false && std::rand() % 100 < straightRate) {
+    if (changeDir == false &&
+        static_cast<unsigned int>(std::rand() % 100) < straightRate) {
       this->backtrackPath(posX + dirX, posY + dirY, dirX, dirY);
     } else {
       dirIdx = this->choseDirection(dirIds);
@@ -92,9 +93,6 @@ bool Maze::findClosestElem(int &posX, int &posY, Entity ent) const {
   } else {
     for (int radius = 1;
          (radius < this->width - 2 || radius < this->height - 2); ++radius) {
-      int tmpX = posX - radius;
-      int tmpY = posY - radius;
-
       for (int tmpY = std::max(posY - radius, 1); tmpY <= posY + radius;
            ++tmpY) {
         if (tmpY >= this->height - 1)
