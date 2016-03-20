@@ -18,15 +18,15 @@ void ClientMain::run() {
 
   TimeHandling time((std::chrono::milliseconds(1000 / gameFps)));
 
-  window.setFramerateLimit(gameFps);
-  window.setVerticalSyncEnabled(true);
+  this->window.setFramerateLimit(gameFps);
+  this->window.setVerticalSyncEnabled(true);
   time.start();
 
   while (window.isOpen()) {
-    window.clear();
+    this->window.clear();
     while (window.pollEvent(event)) {
       if (event.type == sf::Event::Closed) {
-        window.close();
+        this->window.close();
         break;
       }
       entry.fill(event);
@@ -46,7 +46,8 @@ void ClientMain::run() {
         ctrl.mouseMoved(event);
     }
     time.endFrame();
+    this->map.draw(this->window);
     // draw stuff here
-    window.display();
+    this->window.display();
   }
 }

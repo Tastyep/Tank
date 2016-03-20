@@ -19,7 +19,11 @@ public:
   Map &operator=(Map &&other) = default;
 
   void generate(const TileManager &tileManager);
-  void convert(const std::vector<std::vector<Maze::MazeElement>> &mazeData);
+  void draw(sf::RenderTarget &renderTarget);
+
+private:
+  void convert(const std::vector<std::vector<Maze::MazeElement>> &mazeData,
+               const TileManager &tileManager);
 
 private:
   Maze maze;

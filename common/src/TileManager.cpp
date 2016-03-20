@@ -4,7 +4,8 @@
 TileManager::TileManager(unsigned int tileSize) : tileSize(tileSize) {
   auto &tm = TextureManager<>::instance();
   unsigned int tileId = 0;
-  unsigned int nbTile = static_cast<unsigned int>(TileId::Last);
+  unsigned int nbTile = static_cast<unsigned int>(
+      EntityId::Empty); // Empty represents the last element
 
   std::shared_ptr<sf::Texture> gameTexture =
       tm.load("../client/assets/asset.png", "GameAssets");
@@ -22,6 +23,6 @@ TileManager::TileManager(unsigned int tileSize) : tileSize(tileSize) {
   }
 }
 
-const sf::Sprite &TileManager::getTile(TileId id) const {
+const sf::Sprite &TileManager::getTile(EntityId id) const {
   return this->gameTiles[static_cast<int>(id)];
 }

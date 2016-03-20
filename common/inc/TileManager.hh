@@ -1,7 +1,7 @@
 #ifndef TANK_TILEMANAGER_HH_
 #define TANK_TILEMANAGER_HH_
 
-#include "TileIds.hpp"
+#include "EntityId.hpp"
 #include <SFML/Graphics.hpp>
 #include <vector>
 
@@ -15,7 +15,7 @@ public:
   TileManager &operator=(const TileManager &other) = default;
   TileManager &operator=(TileManager &&other) = default;
 
-  const sf::Sprite &getTile(TileId id) const;
+  const sf::Sprite &getTile(EntityId id) const;
 
 private:
   std::vector<sf::Sprite> gameTiles;

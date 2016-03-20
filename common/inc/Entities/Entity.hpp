@@ -1,8 +1,9 @@
 #ifndef TANK_ENTITY_HPP
 #define TANK_ENTITY_HPP
 
+#include "EntityId.hpp"
 #include "Position.hpp"
-#include "TileIds.hpp"
+#include "TileManager.hh"
 #include <SFML/Graphics.hpp>
 
 class Entity {
@@ -20,6 +21,13 @@ public:
 
   const Position &getPosition() const { return this->pos; };
   const sf::Sprite &getSprite() const { return this->sprite; };
+  void setPosition(Position pos) {
+    auto bound =
+        this->sprite.getGlobalBounds(); // your sprite size is equal to the
+                                        // others' sprite size
+    this->pos = pos;
+    this->sprite.setPosition(pos.x * bound.width, pos.y * bound.height);
+  }
 
 protected:
   Position pos;
