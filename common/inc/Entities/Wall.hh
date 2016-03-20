@@ -2,7 +2,6 @@
 #define TANK_WALL_HH
 
 #include "Entity.hpp"
-#include "TileManager.hh"
 
 class Wall : public Entity {
 public:

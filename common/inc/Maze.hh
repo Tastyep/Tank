@@ -21,7 +21,7 @@ public:
   };
 
 public:
-  Maze(int height, int width, int straightRate = 80, int density = 70);
+  Maze(int width, int height, int straightRate = 80, int density = 70);
 
   ~Maze() = default;
   Maze(const Maze &other) = default;

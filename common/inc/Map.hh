@@ -2,6 +2,7 @@
 #define TANK_MAP_HH
 
 #include "Entities/Entity.hpp"
+#include "Grid.hh"
 #include "Maze.hh"
 #include "TileManager.hh"
 #include <functional>
@@ -35,10 +36,11 @@ private:
 
 private:
   Maze maze;
+  Grid grid;
   std::vector<TileData> tileMap;
-  std::vector<std::function<void(const sf::Sprite &sprite, int yPos)>>
+  std::vector<std::function<std::shared_ptr<Entity>(const sf::Sprite &sprite,
+                                                    int posX, int posY)>>
       entitySpawner;
-  std::vector<std::vector<std::shared_ptr<Entity>>> entities;
 };
 
 #endif /* end of include guard: TANK_MAP_HH */

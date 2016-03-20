@@ -2,7 +2,7 @@
 #include "TimeHandling.hpp"
 
 ClientMain::ClientMain(const Settings &settings)
-    : settings(settings), tileManager(32), map(20, 40),
+    : settings(settings), tileManager(32), map(40, 20),
       window(sf::VideoMode(
                  std::stoi(this->settings.getCvarList().getCvar("r_width")),
                  std::stoi(this->settings.getCvarList().getCvar("r_height"))),

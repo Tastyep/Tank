@@ -3,8 +3,8 @@
 #include <algorithm>
 #include <iostream>
 
-Maze::Maze(int height, int width, int straightRate, int density)
-    : width(width + 2), height(height + 2), density(density),
+Maze::Maze(int width, int height, int straightRate, int density)
+    : width(width), height(height), density(density),
       straightRate(straightRate) {
   this->map.resize(this->height);
   this->directions = {{{0, -1}, {1, 0}, {0, 1}, {-1, 0}}};

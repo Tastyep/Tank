@@ -1,11 +1,16 @@
 #include "Map.hh"
 #include "Entities/Wall.hh"
 
-Map::Map(int width, int height) : maze(width, height) {
+#include <iostream>
+
+Map::Map(int width, int height) : maze(width, height), grid(width, height) {
   this->tileMap = {{{static_cast<int>(EntityId::WallFull),
                      static_cast<int>(EntityId::WallBALeft), 0}}};
-  this->entitySpawner = {[this](const sf::Sprite &sprite, int yPos) {
-    this->entities[yPos].emplace_back(new Wall(sprite));
+  this->entitySpawner = {[this](const sf::Sprite &sprite, int posX, int posY) {
+    std::shared_ptr<Entity> ptr(new Wall(sprite));
+
+    this->grid.getCell(posX, posY).addObject(ptr);
+    return ptr;
   }};
 }
 
@@ -16,9 +21,9 @@ void Map::convertWalls(std::vector<std::vector<Maze::MazeElement>> &mazeData) {
   std::array<EntityId, 15> flagMap = {
       EntityId::WallFull,    EntityId::Wall3Top,    EntityId::Wall3Right,
       EntityId::WallTARight, EntityId::Wall3Bottom, EntityId::WallLine,
-      EntityId::WallBARight, EntityId::Empty,       EntityId::Wall3Left,
-      EntityId::WallTALeft,  EntityId::WallCol,     EntityId::Empty,
-      EntityId::WallBALeft,  EntityId::WallLine,    EntityId::WallFull};
+      EntityId::WallBARight, EntityId::WallLine,    EntityId::Wall3Left,
+      EntityId::WallTALeft,  EntityId::WallCol,     EntityId::WallCol,
+      EntityId::WallBALeft,  EntityId::WallLine,    EntityId::WallCol};
   int flag;
   int checkId;
 
@@ -59,28 +64,32 @@ void Map::convert(std::vector<std::vector<Maze::MazeElement>> mazeData,
                                });
         if (it == this->tileMap.end())
           continue;
-        this->entitySpawner[static_cast<int>(it->spawnerPos)](
-            tileManager.getTile(elem.value), y);
-        this->entities[y].back()->setPosition(
-            {static_cast<int>(x), static_cast<int>(y)});
+        auto object = this->entitySpawner[static_cast<int>(it->spawnerPos)](
+            tileManager.getTile(elem.value), x, y);
+
+        object->setPosition({static_cast<int>(x), static_cast<int>(y)});
       }
     }
   }
 }
 
 void Map::generate(const TileManager &tileManager) {
-  int height = this->maze.getHeight();
-
-  entities.clear();
-  entities.resize(height);
   this->maze.generate(2);
   this->convert(this->maze.getMap(), tileManager);
 }
 
 void Map::draw(sf::RenderWindow &renderTarget) {
-  for (auto &col : this->entities) {
-    for (auto &ent : col) {
-      ent->draw(renderTarget);
+  unsigned int width = this->grid.getWidth();
+  unsigned int height = this->grid.getHeight();
+
+  for (unsigned int y = 0; y < height; ++y) {
+    for (unsigned int x = 0; x < width; ++x) {
+      auto &cell = this->grid.getCell(x, y);
+      auto &entities = cell.getObjects();
+
+      for (const auto &entity : entities) {
+        entity->draw(renderTarget);
+      }
     }
   }
 }
