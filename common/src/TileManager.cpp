@@ -17,8 +17,8 @@ TileManager::TileManager(unsigned int tileSize) : tileSize(tileSize) {
     for (unsigned int x = 0; x < textureSize.x && tileId < nbTile;
          x += this->tileSize) {
       this->gameTiles.emplace_back(
-          *gameTexture,
-          sf::IntRect(x, y, x + this->tileSize, y + this->tileSize));
+          *gameTexture, sf::IntRect(x, y, this->tileSize, this->tileSize));
+      ++tileId;
     }
   }
 }

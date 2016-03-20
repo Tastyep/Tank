@@ -5,6 +5,7 @@
 #include "Position.hpp"
 #include "TileManager.hh"
 #include <SFML/Graphics.hpp>
+#include <iostream>
 
 class Entity {
 public:

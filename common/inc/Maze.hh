@@ -12,7 +12,7 @@ public:
     EntityId value;
     int dir;
 
-    MazeElement() : value(EntityId::Wall), dir(0) {}
+    MazeElement() : value(EntityId::WallFull), dir(0) {}
   };
 
   struct Direction {

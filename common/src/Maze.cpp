@@ -123,7 +123,7 @@ void Maze::removeWalls() {
     posX = 1 + std::rand() % (this->width - 2); // Minus size of the border
     posY = 1 + std::rand() % (this->height - 2);
 
-    if (findClosestElem(posX, posY, EntityId::Wall) == true) {
+    if (findClosestElem(posX, posY, EntityId::WallFull) == true) {
       this->map[posY][posX].value = EntityId::Empty;
     } else
       break;

@@ -1,6 +1,19 @@
 #ifndef TANK_ENTITY_ID_HPP
 #define TANK_ENTITY_ID_HPP
 
-enum class EntityId { Wall = 0, Empty = 1 };
+enum class EntityId {
+  WallFull = 0,
+  Wall3Top,
+  Wall3Right,
+  WallTARight,
+  Wall3Bottom,
+  WallLine,
+  WallBARight,
+  Wall3Left,
+  WallTALeft,
+  WallCol,
+  WallBALeft,
+  Empty
+};
 
 #endif /* end of include guard: TANK_ENTITY_ID_HPP */

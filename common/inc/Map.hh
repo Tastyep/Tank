@@ -9,6 +9,13 @@
 #include <vector>
 
 class Map {
+private:
+  struct TileData {
+    int min;
+    int max;
+    int spawnerPos;
+  };
+
 public:
   Map(int height, int width);
 
@@ -19,14 +26,16 @@ public:
   Map &operator=(Map &&other) = default;
 
   void generate(const TileManager &tileManager);
-  void draw(sf::RenderTarget &renderTarget);
+  void draw(sf::RenderWindow &renderTarget);
 
 private:
-  void convert(const std::vector<std::vector<Maze::MazeElement>> &mazeData,
+  void convertWalls(std::vector<std::vector<Maze::MazeElement>> &mazeData);
+  void convert(std::vector<std::vector<Maze::MazeElement>> mazeData,
                const TileManager &tileManager);
 
 private:
   Maze maze;
+  std::vector<TileData> tileMap;
   std::vector<std::function<void(const sf::Sprite &sprite, int yPos)>>
       entitySpawner;
   std::vector<std::vector<std::shared_ptr<Entity>>> entities;
