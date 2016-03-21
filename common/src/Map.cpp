@@ -5,7 +5,7 @@
 
 Map::Map(int width, int height) : maze(width, height), grid(width, height) {
   this->tileMap = {{{static_cast<int>(EntityId::WallFull),
-                     static_cast<int>(EntityId::WallBALeft), 0}}};
+                     static_cast<int>(EntityId::WallSquare), 0}}};
   this->entitySpawner = {[this](const sf::Sprite &sprite, int posX, int posY) {
     std::shared_ptr<Entity> ptr(new Wall(sprite));
 
@@ -18,6 +18,7 @@ void Map::convertWalls(std::vector<std::vector<Maze::MazeElement>> &mazeData) {
   int width = mazeData.front().size();
   int height = mazeData.size();
   std::array<Position, 4> checks = {{{0, -1}, {1, 0}, {0, 1}, {-1, 0}}};
+  std::array<Position, 4> checksDiag = {{{-1, -1}, {1, -1}, {1, 1}, {-1, 1}}};
   std::array<EntityId, 15> flagMap = {
       EntityId::WallFull,    EntityId::Wall3Top,    EntityId::Wall3Right,
       EntityId::WallTARight, EntityId::Wall3Bottom, EntityId::WallLine,
@@ -26,6 +27,8 @@ void Map::convertWalls(std::vector<std::vector<Maze::MazeElement>> &mazeData) {
       EntityId::WallBALeft,  EntityId::WallLine,    EntityId::WallCol};
   int flag;
   int checkId;
+  bool notFree;
+  EntityId value;
 
   for (int y = 0; y < height; ++y) {
     for (int x = 0; x < width; ++x) {
@@ -40,8 +43,21 @@ void Map::convertWalls(std::vector<std::vector<Maze::MazeElement>> &mazeData) {
             flag |= (1 << checkId);
           ++checkId;
         }
-
-        mazeData[y][x].value = flagMap[flag];
+        value = flagMap[flag];
+        if (flagMap[flag] == EntityId::WallFull) {
+          notFree = false;
+          for (const auto &pos : checksDiag) {
+            if (x + pos.x < 0 || x + pos.x >= width || y + pos.y < 0 ||
+                y + pos.y >= height ||
+                mazeData[y + pos.y][x + pos.x].value != EntityId::Empty) {
+              notFree = true;
+              break;
+            }
+          }
+          if (notFree)
+            value = EntityId::WallSquare;
+        }
+        mazeData[y][x].value = value;
       }
     }
   }
@@ -67,18 +83,20 @@ void Map::convert(std::vector<std::vector<Maze::MazeElement>> mazeData,
         auto object = this->entitySpawner[static_cast<int>(it->spawnerPos)](
             tileManager.getTile(elem.value), x, y);
 
-        object->setPosition({static_cast<int>(x), static_cast<int>(y)});
+        object->setPosition({static_cast<float>(x), static_cast<float>(y)});
       }
     }
   }
 }
 
 void Map::generate(const TileManager &tileManager) {
-  this->maze.generate(2);
+  this->maze.generate(9);
   this->convert(this->maze.getMap(), tileManager);
+
+  /* Hard coded */
 }
 
-void Map::draw(sf::RenderWindow &renderTarget) {
+void Map::draw(sf::RenderTarget &renderTarget) {
   unsigned int width = this->grid.getWidth();
   unsigned int height = this->grid.getHeight();
 

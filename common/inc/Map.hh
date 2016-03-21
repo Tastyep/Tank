@@ -27,7 +27,7 @@ public:
   Map &operator=(Map &&other) = default;
 
   void generate(const TileManager &tileManager);
-  void draw(sf::RenderWindow &renderTarget);
+  void draw(sf::RenderTarget &renderTarget);
 
 private:
   void convertWalls(std::vector<std::vector<Maze::MazeElement>> &mazeData);

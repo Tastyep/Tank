@@ -13,6 +13,7 @@ enum class EntityId {
   WallTALeft,
   WallCol,
   WallBALeft,
+  WallSquare,
   Empty
 };
 

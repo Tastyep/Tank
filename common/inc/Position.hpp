@@ -2,8 +2,8 @@
 #define TANK_POSITION_HPP
 
 struct Position {
-  int x;
-  int y;
+  float x;
+  float y;
 
   bool operator==(const Position &pos) const {
     return (pos.x == x && pos.y == y);

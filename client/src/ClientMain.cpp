@@ -1,14 +1,14 @@
 #include "ClientMain.hh"
 #include "TimeHandling.hpp"
 
-ClientMain::ClientMain(const Settings &settings)
-    : settings(settings), tileManager(32), map(40, 20),
+ClientMain::ClientMain(Settings &settings)
+    : settings(settings), tileManager(32), game(settings, tileManager),
       window(sf::VideoMode(
                  std::stoi(this->settings.getCvarList().getCvar("r_width")),
                  std::stoi(this->settings.getCvarList().getCvar("r_height"))),
              "Tank") {}
 
-void ClientMain::loadMap() { this->map.generate(this->tileManager); }
+void ClientMain::loadMap() { this->game.generateMap(); }
 
 void ClientMain::run() {
   Controls &ctrl = settings.getControls();
@@ -45,8 +45,14 @@ void ClientMain::run() {
       else if (event.type == sf::Event::MouseMoved)
         ctrl.mouseMoved(event);
     }
+    // for (int i = 0; i < static_cast<int>(EntityId::Empty); ++i) {
+    //   sf::Sprite s = this->tileManager.getTile(static_cast<EntityId>(i));
+    //
+    //   s.setPosition(i * 30, 0);
+    //   this->window.draw(s);
+    // }
     time.endFrame();
-    this->map.draw(this->window);
+    this->game.draw(this->window);
     // draw stuff here
     this->window.display();
   }

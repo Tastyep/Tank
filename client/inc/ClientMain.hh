@@ -1,15 +1,11 @@
 #ifndef TANK_CLIENTMAIN_HH
 #define TANK_CLIENTMAIN_HH
 
-#include "Map.hh"
-#include "Settings.hh"
-#include "TileManager.hh"
-
-#include <SFML/Graphics.hpp>
+#include "Game.hh"
 
 class ClientMain {
 public:
-  ClientMain(const Settings &settings);
+  ClientMain(Settings &settings);
 
   ~ClientMain() = default;
   ClientMain(const ClientMain &other) = default;
@@ -21,9 +17,9 @@ public:
   void loadMap();
 
 private:
-  Settings settings;
+  Settings &settings;
   TileManager tileManager;
-  Map map;
+  Game game;
   sf::RenderWindow window;
 };
 
