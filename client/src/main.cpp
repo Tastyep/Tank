@@ -8,7 +8,7 @@ int main(int argc, char *argv[]) {
   Settings set;
   Parser parser(set);
 
-  parser.loadConfigFile("./config/config.cfg");
+  parser.loadConfigFile("../client/config.cfg");
   ClientMain client(set);
 
   client.loadMap();

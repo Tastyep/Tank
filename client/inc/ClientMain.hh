@@ -2,6 +2,7 @@
 #define TANK_CLIENTMAIN_HH
 
 #include "Game.hh"
+#include "Parser.hh"
 
 class ClientMain {
 public:
@@ -18,6 +19,7 @@ public:
 
 private:
   Settings &settings;
+  Parser parser;
   TileManager tileManager;
   Game game;
   sf::RenderWindow window;

@@ -2,6 +2,7 @@
 #define TANK_CELL_HH
 
 #include "Entities/Entity.hpp"
+#include "Entities/Movable.hh"
 #include <memory>
 #include <vector>
 
@@ -16,11 +17,14 @@ public:
   Cell &operator=(Cell &&other) = default;
 
   const std::vector<std::shared_ptr<Entity>> &getObjects();
+  const std::vector<std::shared_ptr<Movable>> &getMovableObjects();
   void removeObject(const Position &pos);
   void addObject(std::shared_ptr<Entity> object);
+  void addObject(std::shared_ptr<Movable> object);
 
 private:
   std::vector<std::shared_ptr<Entity>> objects;
+  std::vector<std::shared_ptr<Movable>> movableObjects;
 };
 
 #endif /* end of include guard: TANK_CELL_HH */

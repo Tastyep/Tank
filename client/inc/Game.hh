@@ -18,12 +18,12 @@ public:
   Game &operator=(const Game &other) = default;
   Game &operator=(Game &&other) = default;
 
-  void update();
+  void update(std::chrono::nanoseconds time);
   void draw(sf::RenderTarget &renderTarget);
   void generateMap();
 
 private:
-  Settings &set;
+  Settings &settings;
   TileManager &tileManager;
   Map map;
   ActionAnalyzer actionAnalyzer;

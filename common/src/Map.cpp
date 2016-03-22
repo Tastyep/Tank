@@ -1,4 +1,5 @@
 #include "Map.hh"
+#include "Entities/Player.hh"
 #include "Entities/Wall.hh"
 
 #include <iostream>
@@ -19,12 +20,13 @@ void Map::convertWalls(std::vector<std::vector<Maze::MazeElement>> &mazeData) {
   int height = mazeData.size();
   std::array<Position, 4> checks = {{{0, -1}, {1, 0}, {0, 1}, {-1, 0}}};
   std::array<Position, 4> checksDiag = {{{-1, -1}, {1, -1}, {1, 1}, {-1, 1}}};
-  std::array<EntityId, 15> flagMap = {
+  std::array<EntityId, 16> flagMap = {
       EntityId::WallFull,    EntityId::Wall3Top,    EntityId::Wall3Right,
       EntityId::WallTARight, EntityId::Wall3Bottom, EntityId::WallLine,
       EntityId::WallBARight, EntityId::WallLine,    EntityId::Wall3Left,
       EntityId::WallTALeft,  EntityId::WallCol,     EntityId::WallCol,
-      EntityId::WallBALeft,  EntityId::WallLine,    EntityId::WallCol};
+      EntityId::WallBALeft,  EntityId::WallLine,    EntityId::WallCol,
+      EntityId::WallSquare};
   int flag;
   int checkId;
   bool notFree;
@@ -92,8 +94,31 @@ void Map::convert(std::vector<std::vector<Maze::MazeElement>> mazeData,
 void Map::generate(const TileManager &tileManager) {
   this->maze.generate(9);
   this->convert(this->maze.getMap(), tileManager);
+}
 
+void Map::createPlayer(const TileManager &tileManager,
+                       IActionAnalyzer &actionAnalyzer) {
   /* Hard coded */
+  std::shared_ptr<Movable> ptr(
+      new Player(tileManager.getTile(EntityId::Player), actionAnalyzer));
+
+  this->grid.getCell(1, 1).addObject(ptr);
+}
+
+void Map::update(std::chrono::nanoseconds time) {
+  int width = this->grid.getWidth();
+  int height = this->grid.getHeight();
+
+  for (int y = 0; y < height; ++y) {
+    for (int x = 0; x < width; ++x) {
+      auto &cell = this->grid.getCell(x, y);
+      auto &updatableObjects = cell.getMovableObjects();
+
+      for (auto &obj : updatableObjects) {
+        obj->update(time);
+      }
+    }
+  }
 }
 
 void Map::draw(sf::RenderTarget &renderTarget) {

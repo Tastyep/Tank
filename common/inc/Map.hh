@@ -3,6 +3,7 @@
 
 #include "Entities/Entity.hpp"
 #include "Grid.hh"
+#include "IActionAnalyzer.hpp"
 #include "Maze.hh"
 #include "TileManager.hh"
 #include <functional>
@@ -28,6 +29,10 @@ public:
 
   void generate(const TileManager &tileManager);
   void draw(sf::RenderTarget &renderTarget);
+  void update(std::chrono::nanoseconds time);
+
+  void createPlayer(const TileManager &tileManager,
+                    IActionAnalyzer &actionAnalyzer);
 
 private:
   void convertWalls(std::vector<std::vector<Maze::MazeElement>> &mazeData);

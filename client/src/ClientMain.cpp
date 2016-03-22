@@ -2,7 +2,8 @@
 #include "TimeHandling.hpp"
 
 ClientMain::ClientMain(Settings &settings)
-    : settings(settings), tileManager(32), game(settings, tileManager),
+    : settings(settings), parser(settings), tileManager(32),
+      game(settings, tileManager),
       window(sf::VideoMode(
                  std::stoi(this->settings.getCvarList().getCvar("r_width")),
                  std::stoi(this->settings.getCvarList().getCvar("r_height"))),
@@ -45,6 +46,7 @@ void ClientMain::run() {
       else if (event.type == sf::Event::MouseMoved)
         ctrl.mouseMoved(event);
     }
+    this->game.update(std::chrono::nanoseconds(1));
     // for (int i = 0; i < static_cast<int>(EntityId::Empty); ++i) {
     //   sf::Sprite s = this->tileManager.getTile(static_cast<EntityId>(i));
     //

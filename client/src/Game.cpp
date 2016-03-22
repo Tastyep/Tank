@@ -1,11 +1,20 @@
 #include "Game.hh"
 
-Game::Game(Settings &set, TileManager &tileManager)
-    : set(set), tileManager(tileManager), map(40, 20) {}
+// for debug
+#include <iostream>
 
-void Game::update() {}
+Game::Game(Settings &settings, TileManager &tileManager)
+    : settings(settings), tileManager(tileManager), map(40, 20) {}
 
-void Game::generateMap() { this->map.generate(this->tileManager); }
+void Game::update(std::chrono::nanoseconds time) {
+  this->actionAnalyzer.computeInputChanges(this->settings);
+  this->map.update(time);
+}
+
+void Game::generateMap() {
+  this->map.generate(this->tileManager);
+  this->map.createPlayer(this->tileManager, this->actionAnalyzer);
+}
 
 void Game::draw(sf::RenderTarget &renderTarget) {
   this->map.draw(renderTarget);

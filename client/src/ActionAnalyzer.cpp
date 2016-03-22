@@ -2,7 +2,7 @@
 
 ActionAnalyzer::ActionAnalyzer()
     : oldActionState(static_cast<int>(Action::Last), false),
-      diffState(static_cast<int>(Action::Last), false) {}
+      diffState(static_cast<int>(Action::Last), -1) {}
 
 ActionAnalyzer::~ActionAnalyzer() {}
 
@@ -12,7 +12,8 @@ unsigned int ActionAnalyzer::computeInputChanges(Settings &set) {
   int idx;
   unsigned int changes = 0;
 
-  std::fill(this->diffState.begin(), this->diffState.end(), false);
+  this->actions.clear();
+  std::fill(this->diffState.begin(), this->diffState.end(), -1);
   for (Action act = Action::Forward; act < Action::Last; ++act) {
     cuState = ctrl.getActionState(act);
     idx = static_cast<int>(act);
@@ -21,11 +22,17 @@ unsigned int ActionAnalyzer::computeInputChanges(Settings &set) {
       this->diffState[idx] = cuState;
       ++changes;
     }
+    if (cuState == true)
+      this->actions.push_back(act);
   }
   return changes;
 }
 
-const std::vector<bool> &ActionAnalyzer::getInputChanges() const {
+const std::vector<Action> &ActionAnalyzer::getActions() const {
+  return this->actions;
+}
+
+const std::vector<char> &ActionAnalyzer::getChanges() const {
   return this->diffState;
 }
 

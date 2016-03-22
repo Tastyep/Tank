@@ -1,10 +1,6 @@
 #include "Cell.hh"
 #include <algorithm>
 
-const std::vector<std::shared_ptr<Entity>> &Cell::getObjects() {
-  return this->objects;
-}
-
 void Cell::removeObject(const Position &pos) {
   auto it = std::find_if(this->objects.begin(), this->objects.end(),
                          [&pos](std::shared_ptr<Entity> obj) {
@@ -19,4 +15,16 @@ void Cell::removeObject(const Position &pos) {
 
 void Cell::addObject(std::shared_ptr<Entity> object) {
   this->objects.push_back(object);
+}
+
+void Cell::addObject(std::shared_ptr<Movable> object) {
+  this->movableObjects.push_back(object);
+}
+
+const std::vector<std::shared_ptr<Entity>> &Cell::getObjects() {
+  return this->objects;
+}
+
+const std::vector<std::shared_ptr<Movable>> &Cell::getMovableObjects() {
+  return this->movableObjects;
 }

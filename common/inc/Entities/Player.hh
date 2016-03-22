@@ -1,11 +1,12 @@
 #ifndef TANK_PLAYER_HH
 #define TANK_PLAYER_HH
 
-#include "Entity.hpp"
+#include "IActionAnalyzer.hpp"
+#include "Movable.hh"
 
-class Player : public Entity {
+class Player : public Movable {
 public:
-  Player(const sf::Sprite &sprite);
+  Player(const sf::Sprite &sprite, IActionAnalyzer &actionAnalyzer);
 
   ~Player() = default;
   Player(const Player &other) = default;
@@ -14,7 +15,10 @@ public:
   Player &operator=(Player &&other) = default;
 
   bool intersect(const Entity &ent) const;
-  void draw(sf::RenderTarget &renderTarget) const;
+  void update(std::chrono::nanoseconds);
+
+private:
+  IActionAnalyzer &actionAnalyzer;
 };
 
 #endif /* end of include guard: TANK_PLAYER_HH */
