@@ -67,7 +67,7 @@ void Map::convertWalls(std::vector<std::vector<Maze::MazeElement>> &mazeData) {
 
 void Map::convert(std::vector<std::vector<Maze::MazeElement>> mazeData,
                   const TileManager &tileManager) {
-  this->convertWalls(mazeData);
+  // this->convertWalls(mazeData);
   for (unsigned int y = 0; y < mazeData.size(); ++y) {
     for (unsigned int x = 0; x < mazeData[y].size(); ++x) {
       auto &elem = mazeData[y][x];
@@ -85,7 +85,8 @@ void Map::convert(std::vector<std::vector<Maze::MazeElement>> mazeData,
         auto object = this->entitySpawner[static_cast<int>(it->spawnerPos)](
             tileManager.getTile(elem.value), x, y);
 
-        object->setPosition({static_cast<float>(x), static_cast<float>(y)});
+        object->setPosition(
+            {static_cast<float>(x * 32), static_cast<float>(y * 32)});
       }
     }
   }
@@ -99,11 +100,14 @@ void Map::generate(const TileManager &tileManager) {
 void Map::createPlayer(const TileManager &tileManager,
                        IActionAnalyzer &actionAnalyzer) {
   /* Hard coded */
+  int tileSize = tileManager.getTileSize();
+
   std::shared_ptr<Movable> player(
       new Player(tileManager.getTile(EntityId::Tank), actionAnalyzer));
 
   this->grid.getCell(1, 1).addObject(player);
-  player->setPosition({1, 1});
+  player->setPosition({static_cast<float>(tileSize + tileSize / 2),
+                       static_cast<float>(tileSize + tileSize / 2)});
 }
 
 void Map::update(std::chrono::nanoseconds time) {

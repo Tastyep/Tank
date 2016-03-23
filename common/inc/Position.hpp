@@ -5,6 +5,7 @@ struct Position {
   float x;
   float y;
 
+  Position(float x = 0, float y = 0) : x(x), y(y) {}
   bool operator==(const Position &pos) const {
     return (pos.x == x && pos.y == y);
   }

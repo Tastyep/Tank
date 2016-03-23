@@ -24,7 +24,7 @@ void Player::rotate(Action act) {
   this->sprite.rotate(rotationSide);
 }
 
-void Player::displace(Action act, std::chrono::nanoseconds time) {
+void Player::displace(Action act, std::chrono::nanoseconds time, Grid &grid) {
   sf::Vector2f displacement;
 
   this->acceleration = (act == Action::Forward ? -1 : 1);
@@ -34,9 +34,13 @@ void Player::displace(Action act, std::chrono::nanoseconds time) {
   displacement.x = this->velocity * time.count() * this->direction.x;
   displacement.y = this->velocity * time.count() * this->direction.y;
 
-  this->position.x += displacement.x;
-  this->position.y += displacement.y;
-  this->sprite.move(displacement.x, displacement.y);
+  Position next(this->position.x + displacement.x,
+                this->position.y + displacement.y);
+  if (grid.checkCollision(next, *this) == false) {
+    this->position.x = next.x;
+    this->position.y = next.y;
+    this->sprite.move(displacement.x, displacement.y);
+  }
 }
 
 void Player::update(Grid &grid, std::chrono::nanoseconds time) {
@@ -50,7 +54,7 @@ void Player::update(Grid &grid, std::chrono::nanoseconds time) {
       break;
     case Action::Forward:
     case Action::Back:
-      this->displace(act, time);
+      this->displace(act, time, grid);
       break;
     default:
       break;

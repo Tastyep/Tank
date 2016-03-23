@@ -1,7 +1,7 @@
 #ifndef TANK_WALL_HH
 #define TANK_WALL_HH
 
-#include "Entity.hpp"
+#include "Entity.hh"
 
 class Wall : public Entity {
 public:

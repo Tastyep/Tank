@@ -25,7 +25,7 @@ public:
 
 private:
   void rotate(Action act);
-  void displace(Action act, std::chrono::nanoseconds time);
+  void displace(Action act, std::chrono::nanoseconds time, Grid &grid);
 
 private:
   IActionAnalyzer &actionAnalyzer;

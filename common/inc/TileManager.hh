@@ -7,7 +7,7 @@
 
 class TileManager {
 public:
-  TileManager(unsigned int tileSize = 64);
+  TileManager(unsigned int tileSize = 32);
 
   ~TileManager() = default;
   TileManager(const TileManager &other) = default;
@@ -16,6 +16,7 @@ public:
   TileManager &operator=(TileManager &&other) = default;
 
   const sf::Sprite &getTile(EntityId id) const;
+  int getTileSize() const;
 
 private:
   std::vector<sf::Sprite> gameTiles;

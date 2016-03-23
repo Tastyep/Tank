@@ -1,7 +1,7 @@
 #ifndef TANK_CELL_HH
 #define TANK_CELL_HH
 
-#include "Entities/Entity.hpp"
+#include "Entities/Entity.hh"
 #include "Entities/Movable.hh"
 #include <memory>
 #include <vector>

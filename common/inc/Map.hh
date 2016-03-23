@@ -1,7 +1,7 @@
 #ifndef TANK_MAP_HH
 #define TANK_MAP_HH
 
-#include "Entities/Entity.hpp"
+#include "Entities/Entity.hh"
 #include "Grid.hh"
 #include "IActionAnalyzer.hpp"
 #include "Maze.hh"

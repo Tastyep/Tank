@@ -23,6 +23,8 @@ TileManager::TileManager(unsigned int tileSize) : tileSize(tileSize) {
   }
 }
 
+int TileManager::getTileSize() const { return this->tileSize; }
+
 const sf::Sprite &TileManager::getTile(EntityId id) const {
   return this->gameTiles[static_cast<int>(id)];
 }

@@ -1,7 +1,7 @@
 #ifndef TANK_MOVABLE_HH
 #define TANK_MOVABLE_HH
 
-#include "Entity.hpp"
+#include "Entity.hh"
 #include "Updatable.hpp"
 
 class Movable : public Entity, public Updatable {
