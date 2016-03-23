@@ -99,10 +99,11 @@ void Map::generate(const TileManager &tileManager) {
 void Map::createPlayer(const TileManager &tileManager,
                        IActionAnalyzer &actionAnalyzer) {
   /* Hard coded */
-  std::shared_ptr<Movable> ptr(
-      new Player(tileManager.getTile(EntityId::Player), actionAnalyzer));
+  std::shared_ptr<Movable> player(
+      new Player(tileManager.getTile(EntityId::Tank), actionAnalyzer));
 
-  this->grid.getCell(1, 1).addObject(ptr);
+  this->grid.getCell(1, 1).addObject(player);
+  player->setPosition({1, 1});
 }
 
 void Map::update(std::chrono::nanoseconds time) {
@@ -115,7 +116,7 @@ void Map::update(std::chrono::nanoseconds time) {
       auto &updatableObjects = cell.getMovableObjects();
 
       for (auto &obj : updatableObjects) {
-        obj->update(time);
+        obj->update(this->grid, time);
       }
     }
   }
@@ -129,10 +130,12 @@ void Map::draw(sf::RenderTarget &renderTarget) {
     for (unsigned int x = 0; x < width; ++x) {
       auto &cell = this->grid.getCell(x, y);
       auto &entities = cell.getObjects();
+      auto &updatableEntities = cell.getMovableObjects();
 
-      for (const auto &entity : entities) {
+      for (const auto &entity : entities)
         entity->draw(renderTarget);
-      }
+      for (const auto &entity : updatableEntities)
+        entity->draw(renderTarget);
     }
   }
 }

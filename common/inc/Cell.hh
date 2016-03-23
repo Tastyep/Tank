@@ -6,6 +6,8 @@
 #include <memory>
 #include <vector>
 
+class Movable;
+
 class Cell {
 public:
   Cell() = default;

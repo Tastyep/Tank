@@ -49,7 +49,7 @@ void ClientMain::run() {
     this->game.update(std::chrono::nanoseconds(1));
     // for (int i = 0; i < static_cast<int>(EntityId::Empty); ++i) {
     //   sf::Sprite s = this->tileManager.getTile(static_cast<EntityId>(i));
-    //
+    // 
     //   s.setPosition(i * 30, 0);
     //   this->window.draw(s);
     // }

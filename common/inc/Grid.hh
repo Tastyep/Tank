@@ -3,6 +3,8 @@
 
 #include "Cell.hh"
 
+class Cell;
+
 class Grid {
 public:
   Grid(int width, int height);

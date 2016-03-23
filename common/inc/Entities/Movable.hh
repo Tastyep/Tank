@@ -6,7 +6,7 @@
 
 class Movable : public Entity, public Updatable {
 public:
-  Movable(const sf::Sprite &sprite, double maxVelocity = 1);
+  Movable(const sf::Sprite &sprite, double maxVelocity = 2);
 
   ~Movable() = default;
   Movable(const Movable &other) = default;
@@ -14,7 +14,7 @@ public:
   Movable &operator=(const Movable &other) = default;
   Movable &operator=(Movable &&other) = default;
 
-  virtual void update(std::chrono::nanoseconds time);
+  virtual void update(Grid &grid, std::chrono::nanoseconds time) = 0;
   void draw(sf::RenderTarget &renderTarget) const;
   virtual bool intersect(const Entity &ent) const = 0;
 

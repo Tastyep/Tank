@@ -9,7 +9,10 @@
 
 class Entity {
 public:
-  Entity(const sf::Sprite &sprite) : sprite(sprite){};
+  Entity(const sf::Sprite &sprite) : sprite(sprite) {
+    auto bound = this->sprite.getGlobalBounds();
+    this->sprite.setOrigin(bound.width / 2, bound.height / 2);
+  };
 
   ~Entity() = default;
   Entity(const Entity &other) = default;
@@ -20,18 +23,18 @@ public:
   virtual bool intersect(const Entity &ent) const = 0;
   virtual void draw(sf::RenderTarget &renderTarget) const = 0;
 
-  const Position &getPosition() const { return this->pos; };
+  const Position &getPosition() const { return this->position; };
   const sf::Sprite &getSprite() const { return this->sprite; };
   void setPosition(Position pos) {
     auto bound =
         this->sprite.getGlobalBounds(); // your sprite size is equal to the
                                         // others' sprite size
-    this->pos = pos;
+    this->position = pos;
     this->sprite.setPosition(pos.x * bound.width, pos.y * bound.height);
   }
 
 protected:
-  Position pos;
+  Position position;
   sf::Sprite sprite;
 };
 

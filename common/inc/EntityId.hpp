@@ -14,7 +14,7 @@ enum class EntityId {
   WallCol,
   WallBALeft,
   WallSquare,
-  Player,
+  Tank,
   Empty
 };
 
