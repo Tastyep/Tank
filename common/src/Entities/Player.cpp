@@ -22,6 +22,7 @@ void Player::rotate(Action act) {
   this->direction.x = std::cos(radianAngle);
   this->direction.y = std::sin(radianAngle);
   this->sprite.rotate(rotationSide);
+  this->spriteBound.rotate(rotationSide);
 }
 
 void Player::displace(Action act, std::chrono::nanoseconds time, Grid &grid) {
@@ -40,6 +41,7 @@ void Player::displace(Action act, std::chrono::nanoseconds time, Grid &grid) {
     this->position.x = next.x;
     this->position.y = next.y;
     this->sprite.move(displacement.x, displacement.y);
+    this->spriteBound.move(displacement);
   }
 }
 

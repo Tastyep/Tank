@@ -9,9 +9,6 @@ Grid::Grid(int width, int height) : width(width), height(height) {
 bool Grid::checkCollision(const Position &position, const Entity &entity) {
   Position cellPosition(position.x / 32, position.y / 32);
 
-  std::cout << "cu: " << entity.getPosition().x << " " << entity.getPosition().y
-            << " next: " << position.x << " " << position.y << " | "
-            << cellPosition.x << " " << cellPosition.y << std::endl;
   if (cellPosition.x < 0 || cellPosition.y < 0 ||
       cellPosition.x >= this->width || cellPosition.y >= this->height)
     return true;

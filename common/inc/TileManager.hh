@@ -2,7 +2,8 @@
 #define TANK_TILEMANAGER_HH_
 
 #include "EntityId.hpp"
-#include <SFML/Graphics.hpp>
+#include "Position.hpp"
+#include "SpriteCollision.hh"
 #include <vector>
 
 class TileManager {
@@ -17,9 +18,11 @@ public:
 
   const sf::Sprite &getTile(EntityId id) const;
   int getTileSize() const;
+  const SpriteCollision &getSpriteCollisionObject(EntityId id) const;
 
 private:
   std::vector<sf::Sprite> gameTiles;
+  std::vector<SpriteCollision> spriteCollisions;
   unsigned int tileSize;
 };
 

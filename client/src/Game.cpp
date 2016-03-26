@@ -4,7 +4,7 @@
 #include <iostream>
 
 Game::Game(Settings &settings, TileManager &tileManager)
-    : settings(settings), tileManager(tileManager), map(40, 20) {}
+    : settings(settings), tileManager(tileManager), map(10, 10) {}
 
 void Game::update(std::chrono::nanoseconds time) {
   this->actionAnalyzer.computeInputChanges(this->settings);

@@ -3,6 +3,7 @@
 
 #include "EntityId.hpp"
 #include "Position.hpp"
+#include "SpriteCollision.hh"
 #include "TileManager.hh"
 #include <SFML/Graphics.hpp>
 #include <memory>
@@ -23,10 +24,13 @@ public:
   const Position &getPosition() const;
   const sf::Sprite &getSprite() const;
   void setPosition(Position pos);
+  void setSpriteCollisionObject(const SpriteCollision &spriteBound);
+  const SpriteCollision &getSpriteCollisionObject() const;
 
 protected:
   Position position;
   sf::Sprite sprite;
+  SpriteCollision spriteBound;
 };
 
 #endif /* end of include guard: TANK_ENTITY_HPP */
