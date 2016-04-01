@@ -10,6 +10,10 @@
 
 class Entity {
 public:
+  static constexpr auto pi = std::acos(-1);
+  static constexpr double radianConvert = (pi / 180.0);
+
+public:
   Entity(const sf::Sprite &sprite);
 
   ~Entity() = default;
@@ -24,6 +28,8 @@ public:
   const Position &getPosition() const;
   const sf::Sprite &getSprite() const;
   void setPosition(Position pos);
+  void move(const sf::Vector2f &displacement);
+  void applyRotation(double angle);
   void setSpriteCollisionObject(const SpriteCollision &spriteBound);
   const SpriteCollision &getSpriteCollisionObject() const;
 
@@ -31,6 +37,7 @@ protected:
   Position position;
   sf::Sprite sprite;
   SpriteCollision spriteBound;
+  double angle;
 };
 
 #endif /* end of include guard: TANK_ENTITY_HPP */

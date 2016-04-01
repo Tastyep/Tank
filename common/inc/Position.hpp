@@ -2,6 +2,7 @@
 #define TANK_POSITION_HPP
 
 #include <SFML/Graphics.hpp>
+#include <iostream>
 
 struct Position {
   float x;
@@ -29,10 +30,19 @@ struct Position {
     this->x += pos.x;
     this->y += pos.y;
   }
+  void operator+=(const sf::Vector2f &vec) {
+    this->x += vec.x;
+    this->y += vec.y;
+  }
   void operator-=(const Position &pos) {
     this->x -= pos.x;
     this->y -= pos.y;
   }
 };
+
+inline std::ostream &operator<<(std::ostream &stream, const Position &pos) {
+  stream << "[" << pos.x << "," << pos.y << "]";
+  return stream;
+}
 
 #endif /* end of include guard: TANK_POSITION_HPP */

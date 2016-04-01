@@ -1,4 +1,5 @@
 #include "Rectangle.hh"
+#include <limits>
 
 Rectangle::Rectangle(const Position &tl, const Position &br) {
   this->edges[0] = tl;
@@ -55,35 +56,36 @@ void Rectangle::rotate(double angle) {
 
 bool Rectangle::intersects(const Rectangle &rect) const {
   const auto &edges = rect.getEdges();
-  const auto &rectEdges = rect.getEdges();
 
   for (int rectId = 0; rectId < 2; ++rectId) {
-    const auto &cuEdges = (rectId == 0 ? edges : rectEdges);
+    const auto &cuEdges = (rectId == 0 ? this->edges : edges);
 
     for (unsigned int i = 0; i < cuEdges.size(); ++i) {
       int j = (i + 1) % cuEdges.size();
-      double normalx = cuEdges[j].y - cuEdges[i].y;
-      double normaly = cuEdges[j].x - cuEdges[i].x;
-      Position minmaxA;
-      Position minmaxB;
+      sf::Vector2f normal(cuEdges[j].y - cuEdges[i].y,
+                          cuEdges[i].x - cuEdges[j].x);
+      double minA = std::numeric_limits<double>::max();
+      double minB = std::numeric_limits<double>::max();
+      double maxA = std::numeric_limits<double>::min();
+      double maxB = std::numeric_limits<double>::min();
 
+      for (const auto &edge : this->edges) {
+        double projected = normal.x * edge.x + normal.y * edge.y;
+
+        if (projected < minA)
+          minA = projected;
+        if (projected > maxA)
+          maxA = projected;
+      }
       for (const auto &edge : edges) {
-        double projected = normalx * edge.x + normaly * edge.y;
+        double projected = normal.x * edge.x + normal.y * edge.y;
 
-        if (projected < minmaxA.x)
-          minmaxA.x = projected;
-        if (projected > minmaxA.y)
-          minmaxA.y = projected;
+        if (projected < minB)
+          minB = projected;
+        if (projected > maxB)
+          maxB = projected;
       }
-      for (const auto &edge : rectEdges) {
-        double projected = normalx * edge.x + normaly * edge.y;
-
-        if (projected < minmaxB.x)
-          minmaxB.x = projected;
-        if (projected > minmaxB.y)
-          minmaxB.y = projected;
-      }
-      if (minmaxA.y < minmaxB.x || minmaxB.y < minmaxA.x)
+      if (maxA < minB || maxB < minA)
         return false;
     }
   }

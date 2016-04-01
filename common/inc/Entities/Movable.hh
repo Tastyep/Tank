@@ -16,7 +16,10 @@ public:
 
   virtual void update(Grid &grid, std::chrono::nanoseconds time) = 0;
   void draw(sf::RenderTarget &renderTarget) const;
-  virtual bool intersect(const Entity &ent) const = 0;
+
+protected:
+  void displace(int side, std::chrono::nanoseconds time, Grid &grid);
+  void rotate(double angle, Grid &grid);
 
 protected:
   double maxVelocity;
