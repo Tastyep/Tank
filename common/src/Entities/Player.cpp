@@ -15,14 +15,13 @@ void Player::spawnBall(Grid &grid) {
 
   Position ballPos = this->position;
   Position gridPos;
-  const Rectangle &bound = this->spriteBound.getBound();
-  const Rectangle &ballBound = ball->getSpriteCollisionObject().getBound();
+  const auto &ballBound = ball->getSpriteCollisionObject().getBound();
   const auto &spriteBound = this->sprite.getLocalBounds();
 
   ballPos.x +=
-      (this->direction.x * (bound.getWidth() / 2 + ballBound.getWidth() / 2));
-  ballPos.y += (-this->direction.y *
-                (bound.getHeight() / 2 + ballBound.getHeight() / 2));
+      (this->direction.x * (spriteBound.width / 2 + ballBound.getWidth() / 2));
+  ballPos.y += (this->direction.y *
+                (spriteBound.height / 2 + ballBound.getHeight() / 2));
   gridPos.x = ballPos.x / spriteBound.width;
   gridPos.y = ballPos.y / spriteBound.height;
 
