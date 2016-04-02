@@ -1,7 +1,12 @@
 #include "Entities/Movable.hh"
+#include "Grid.hh"
 #include <iostream>
+
 Movable::Movable(const sf::Sprite &sprite, double maxVelocity)
-    : Entity(sprite), maxVelocity(maxVelocity), velocity(0), acceleration(0) {}
+    : Entity(sprite), maxVelocity(maxVelocity), velocity(0), acceleration(0) {
+  this->direction.x = std::cos(this->angle * radianConvert);
+  this->direction.y = -std::sin(this->angle * radianConvert);
+}
 
 void Movable::rotate(double angle, Grid &grid) {
   double radianAngle;
@@ -13,7 +18,7 @@ void Movable::rotate(double angle, Grid &grid) {
   }
   radianAngle = radianConvert * this->angle;
   this->direction.x = std::cos(radianAngle);
-  this->direction.y = std::sin(radianAngle);
+  this->direction.y = -std::sin(radianAngle);
 }
 
 void Movable::displace(int side, std::chrono::nanoseconds time, Grid &grid) {
@@ -43,4 +48,8 @@ void Movable::draw(sf::RenderTarget &renderTarget) const {
   convex.setOutlineColor(sf::Color(255, 255, 255));
   convex.setOutlineThickness(1);
   renderTarget.draw(convex);
+}
+
+void Movable::setDirection(const sf::Vector2f direction) {
+  this->direction = direction;
 }

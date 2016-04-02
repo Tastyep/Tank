@@ -3,6 +3,7 @@
 
 #include "IActionAnalyzer.hpp"
 #include "Movable.hh"
+#include "SpriteCollision.hh"
 #include <cmath>
 
 class Player : public Movable {
@@ -10,7 +11,8 @@ private:
   static constexpr double alpha = 5;
 
 public:
-  Player(const sf::Sprite &sprite, IActionAnalyzer &actionAnalyzer);
+  Player(const sf::Sprite &sprite, IActionAnalyzer &actionAnalyzer,
+         const SpriteCollision &ballSpriteBound, const sf::Sprite &ballSprite);
 
   ~Player() = default;
   Player(const Player &other) = default;
@@ -21,7 +23,12 @@ public:
   void update(Grid &grid, std::chrono::nanoseconds);
 
 private:
+  void spawnBall(Grid &grid);
+
+private:
   IActionAnalyzer &actionAnalyzer;
+  const SpriteCollision &ballSpriteBound;
+  const sf::Sprite &ballSprite;
 };
 
 #endif /* end of include guard: TANK_PLAYER_HH */

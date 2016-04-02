@@ -41,6 +41,8 @@ public:
   const std::array<Position, 4> &getEdges() const;
   bool intersects(const Rectangle &rect) const;
   void setInternTranslation(const sf::Vector2f &tr);
+  float getWidth() const;
+  float getHeight() const;
 
 private:
   std::array<Position, 4> edges;

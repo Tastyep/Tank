@@ -91,3 +91,7 @@ bool Rectangle::intersects(const Rectangle &rect) const {
   }
   return true;
 }
+
+float Rectangle::getWidth() const { return this->width; }
+
+float Rectangle::getHeight() const { return this->height; }

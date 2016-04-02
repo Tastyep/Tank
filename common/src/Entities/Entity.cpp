@@ -1,7 +1,7 @@
 #include "Entities/Entity.hh"
 #include <iostream>
 
-Entity::Entity(const sf::Sprite &sprite) : sprite(sprite), angle(270) {
+Entity::Entity(const sf::Sprite &sprite) : sprite(sprite), angle(0) {
   auto bound = this->sprite.getGlobalBounds();
 
   this->sprite.setOrigin(bound.width / 2, bound.height / 2);
@@ -28,8 +28,8 @@ void Entity::applyRotation(double angle) {
     this->angle -= 360;
   else if (this->angle < 0)
     this->angle += 360;
-  this->sprite.rotate(angle);
-  this->spriteBound.rotate(angle);
+  this->sprite.rotate(-angle);
+  this->spriteBound.rotate(-angle);
 }
 
 bool Entity::intersect(std::shared_ptr<Entity> ent) const {

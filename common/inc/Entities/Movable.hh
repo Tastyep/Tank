@@ -16,9 +16,10 @@ public:
 
   virtual void update(Grid &grid, std::chrono::nanoseconds time) = 0;
   void draw(sf::RenderTarget &renderTarget) const;
+  void setDirection(const sf::Vector2f direction);
 
 protected:
-  void displace(int side, std::chrono::nanoseconds time, Grid &grid);
+  virtual void displace(int side, std::chrono::nanoseconds time, Grid &grid);
   void rotate(double angle, Grid &grid);
 
 protected:

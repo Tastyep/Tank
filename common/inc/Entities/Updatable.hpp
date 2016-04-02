@@ -1,7 +1,6 @@
 #ifndef TANK_UPDATABLE_HH
 #define TANK_UPDATABLE_HH
 
-#include "Grid.hh"
 #include <chrono>
 
 class Grid;

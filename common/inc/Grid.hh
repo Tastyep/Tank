@@ -2,8 +2,7 @@
 #define TANK_GRID_HH
 
 #include "Cell.hh"
-
-class Cell;
+#include <queue>
 
 class Grid {
 public:
@@ -19,11 +18,16 @@ public:
   bool checkCollision(const Entity &entity);
   int getHeight() const;
   int getWidth() const;
+  void processQueue();
+  void addObjectToQueue(std::shared_ptr<Entity> object);
+  void addObjectToQueue(std::shared_ptr<Movable> object);
 
 private:
   int width;
   int height;
   std::vector<std::vector<Cell>> cells;
+  std::queue<std::shared_ptr<Entity>> objects;
+  std::queue<std::shared_ptr<Movable>> movableObjects;
 };
 
 #endif /* end of include guard: TANK_GRID_HH */

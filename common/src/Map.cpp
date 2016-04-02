@@ -107,7 +107,9 @@ void Map::createPlayer(const TileManager &tileManager,
   int tileSize = tileManager.getTileSize();
 
   std::shared_ptr<Movable> player(
-      new Player(tileManager.getTile(EntityId::Tank), actionAnalyzer));
+      new Player(tileManager.getTile(EntityId::Tank), actionAnalyzer,
+                 tileManager.getSpriteCollisionObject(EntityId::Ball),
+                 tileManager.getTile(EntityId::Ball)));
 
   this->grid.getCell(1, 1).addObject(player);
   player->setSpriteCollisionObject(
@@ -130,6 +132,7 @@ void Map::update(std::chrono::nanoseconds time) {
       }
     }
   }
+  this->grid.processQueue();
 }
 
 void Map::draw(sf::RenderTarget &renderTarget) {

@@ -1,5 +1,6 @@
 #include "Grid.hh"
 #include <iostream>
+
 Grid::Grid(int width, int height) : width(width), height(height) {
   this->cells.resize(height);
   for (auto &cell : this->cells)
@@ -50,3 +51,32 @@ int Grid::getHeight() const { return this->height; }
 int Grid::getWidth() const { return this->width; }
 
 Cell &Grid::getCell(int x, int y) { return this->cells[y][x]; }
+
+void Grid::addObjectToQueue(std::shared_ptr<Entity> object) {
+  this->objects.push(object);
+}
+
+void Grid::addObjectToQueue(std::shared_ptr<Movable> object) {
+  this->movableObjects.push(object);
+}
+
+void Grid::processQueue() {
+  while (!this->objects.empty()) {
+    std::shared_ptr<Entity> object = this->objects.front();
+    const auto &bound = object->getSprite().getGlobalBounds();
+    const Position &position = object->getPosition();
+
+    this->getCell(position.x / bound.width, position.y / bound.height)
+        .addObject(object);
+    this->objects.pop();
+  }
+  while (!this->movableObjects.empty()) {
+    std::shared_ptr<Movable> object = this->movableObjects.front();
+    const auto &bound = object->getSprite().getGlobalBounds();
+    const Position &position = object->getPosition();
+
+    this->getCell(position.x / bound.width, position.y / bound.height)
+        .addObject(object);
+    this->movableObjects.pop();
+  }
+}
