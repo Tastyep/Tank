@@ -20,7 +20,7 @@ inline Action operator++(Action &x) {
   return (x = static_cast<Action>(static_cast<int>(x) + 1));
 }
 
-enum class actionType { Default = 0, Toggle };
+enum class ActionType { Default = 0, Toggle, Unique };
 
 struct Entry {
   ctrl::key key;
@@ -64,10 +64,10 @@ struct Entry {
 
 typedef struct ActionData {
   std::string code;
-  actionType type;
+  ActionType type;
   bool state;
 
-  ActionData(const std::string &c, actionType t = actionType::Default)
+  ActionData(const std::string &c, ActionType t = ActionType::Default)
       : code(c), type(t), state(false) {}
 } t_action;
 
@@ -88,6 +88,7 @@ public:
   Action getActionFromKey(const Entry &entry) const;
   Action getActionFromCode(const std::string &code) const;
   bool getActionState(Action act) const;
+  ActionType getActionType(Action act) const;
   Entry getKeyFromCode(const std::string &code) const;
   Entry getKeyFromAction(Action act) const;
   Entry getLastKey(Action act) const;

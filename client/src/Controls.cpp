@@ -116,12 +116,12 @@ Controls::Controls() {
   this->actions.push_back(t_action("back"));
   this->actions.push_back(t_action("right"));
   this->actions.push_back(t_action("left"));
-  this->actions.push_back(t_action("use"));
+  this->actions.push_back(t_action("use", ActionType::Unique));
   this->actions.push_back(t_action("moveup"));
   this->actions.push_back(t_action("movedown"));
-  this->actions.push_back(t_action("console", actionType::Toggle));
-  this->actions.push_back(t_action("quickMenu", actionType::Toggle));
-  this->actions.push_back(t_action("chat", actionType::Toggle));
+  this->actions.push_back(t_action("console", ActionType::Toggle));
+  this->actions.push_back(t_action("quickMenu", ActionType::Toggle));
+  this->actions.push_back(t_action("chat", ActionType::Toggle));
 
   for (unsigned int i = 0; i < static_cast<int>(Action::Last); ++i)
     this->actionKeys.insert(std::pair<Action, std::array<Entry, 5>>(
@@ -167,6 +167,10 @@ std::pair<bool, std::string> Controls::getCodeFromAction(Action act) const {
 
 bool Controls::getActionState(Action act) const {
   return (this->actions[static_cast<unsigned int>(act)].state);
+}
+
+ActionType Controls::getActionType(Action act) const {
+  return (this->actions[static_cast<unsigned int>(act)].type);
 }
 
 Entry Controls::getKeyFromCode(const std::string &code) const {
@@ -281,7 +285,7 @@ void Controls::pressKey(const Entry &entry) {
       static_cast<unsigned int>(act) >= this->actions.size())
     return;
   t_action &action = this->actions[static_cast<unsigned int>(act)];
-  if (action.type == actionType::Toggle)
+  if (action.type == ActionType::Toggle)
     action.state = !action.state;
   else
     action.state = true;
@@ -297,7 +301,7 @@ void Controls::releaseKey(const Entry &entry) {
     return;
 
   t_action &action = this->actions[static_cast<unsigned int>(act)];
-  if (action.type != actionType::Toggle)
+  if (action.type != ActionType::Toggle)
     action.state = false;
 }
 

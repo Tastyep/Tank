@@ -9,6 +9,7 @@ ActionAnalyzer::~ActionAnalyzer() {}
 unsigned int ActionAnalyzer::computeInputChanges(Settings &set) {
   Controls &ctrl = set.getControls();
   bool cuState;
+  ActionType type;
   int idx;
   unsigned int changes = 0;
 
@@ -16,14 +17,17 @@ unsigned int ActionAnalyzer::computeInputChanges(Settings &set) {
   std::fill(this->diffState.begin(), this->diffState.end(), -1);
   for (Action act = Action::Forward; act < Action::Last; ++act) {
     cuState = ctrl.getActionState(act);
+    type = ctrl.getActionType(act);
     idx = static_cast<int>(act);
+    if (cuState == true) {
+      if (!(type == ActionType::Unique && this->oldActionState[idx] == true))
+        this->actions.push_back(act);
+    }
     if (cuState != this->oldActionState[idx]) {
       this->oldActionState[idx] = cuState;
       this->diffState[idx] = cuState;
       ++changes;
     }
-    if (cuState == true)
-      this->actions.push_back(act);
   }
   return changes;
 }
