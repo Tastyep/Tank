@@ -28,3 +28,18 @@ const std::vector<std::shared_ptr<Entity>> &Cell::getObjects() {
 const std::vector<std::shared_ptr<Movable>> &Cell::getMovableObjects() {
   return this->movableObjects;
 }
+
+void Cell::removeDeadEntities() {
+  this->movableObjects.erase(
+      std::remove_if(this->movableObjects.begin(), this->movableObjects.end(),
+                     [](auto ent) { return !ent->isAlive(); }),
+      this->movableObjects.end());
+}
+
+void Cell::update(Grid &grid, std::chrono::nanoseconds time) {
+  for (auto &obj : this->movableObjects) {
+    if (obj->isAlive())
+      obj->update(grid, time);
+  }
+  this->removeDeadEntities();
+}

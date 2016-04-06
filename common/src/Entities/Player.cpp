@@ -1,5 +1,6 @@
 #include "Entities/Player.hh"
 #include "Entities/Ball.hh"
+#include "Entities/Wall.hh"
 #include "Grid.hh"
 #include <iostream>
 
@@ -56,3 +57,10 @@ void Player::update(Grid &grid, std::chrono::nanoseconds time) {
     }
   }
 }
+
+void Player::impact(std::shared_ptr<Entity> entity) {
+  entity->getImpacted(*this);
+}
+
+void Player::getImpacted(Entity &entity) {}
+void Player::getImpacted(Ball &ball) { this->alive = false; }

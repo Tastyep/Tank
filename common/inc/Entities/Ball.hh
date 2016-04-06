@@ -14,9 +14,17 @@ public:
   Ball &operator=(Ball &&other) = default;
 
   void update(Grid &grid, std::chrono::nanoseconds time);
+  void getImpacted(Entity &entity);
+  void getImpacted(Player &player);
+  void impact(std::shared_ptr<Entity> entity);
+  void bounce();
 
 private:
   virtual void displace(int side, std::chrono::nanoseconds time, Grid &grid);
+
+private:
+  unsigned int bounceCount;
+  unsigned int maxBounce;
 };
 
 #endif /* end of include guard: TANK_BALL_HH */

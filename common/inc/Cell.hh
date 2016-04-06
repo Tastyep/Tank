@@ -24,6 +24,11 @@ public:
   void addObject(std::shared_ptr<Entity> object);
   void addObject(std::shared_ptr<Movable> object);
 
+  void update(Grid &grid, std::chrono::nanoseconds time);
+
+private:
+  void removeDeadEntities();
+
 private:
   std::vector<std::shared_ptr<Entity>> objects;
   std::vector<std::shared_ptr<Movable>> movableObjects;

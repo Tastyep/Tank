@@ -125,11 +125,8 @@ void Map::update(std::chrono::nanoseconds time) {
   for (int y = 0; y < height; ++y) {
     for (int x = 0; x < width; ++x) {
       auto &cell = this->grid.getCell(x, y);
-      auto &updatableObjects = cell.getMovableObjects();
 
-      for (auto &obj : updatableObjects) {
-        obj->update(this->grid, time);
-      }
+      cell.update(this->grid, time);
     }
   }
   this->grid.processQueue();

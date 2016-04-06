@@ -1,8 +1,10 @@
 #include "Entities/Ball.hh"
+#include "Entities/Player.hh"
 #include "Grid.hh"
 #include <iostream>
 
-Ball::Ball(const sf::Sprite &sprite) : Movable(sprite) {}
+Ball::Ball(const sf::Sprite &sprite)
+    : Movable(sprite), bounceCount(0), maxBounce(5) {}
 
 void Ball::displace(int side, std::chrono::nanoseconds time, Grid &grid) {
   sf::Vector2f displacement;
@@ -21,4 +23,17 @@ void Ball::displace(int side, std::chrono::nanoseconds time, Grid &grid) {
 
 void Ball::update(Grid &grid, std::chrono::nanoseconds time) {
   this->displace(1, time, grid);
+}
+
+void Ball::getImpacted(Entity &entity) {}
+void Ball::getImpacted(Player &player) {}
+
+void Ball::impact(std::shared_ptr<Entity> entity) {
+  entity->getImpacted(*this);
+}
+
+void Ball::bounce() {
+  ++this->bounceCount;
+  if (this->bounceCount > this->maxBounce)
+    this->alive = false;
 }

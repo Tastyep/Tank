@@ -1,4 +1,6 @@
 #include "Entities/Wall.hh"
+#include "Entities/Ball.hh"
+#include "Entities/Player.hh"
 
 Wall::Wall(const sf::Sprite &sprite) : Entity(sprite) {}
 
@@ -19,3 +21,7 @@ void Wall::draw(sf::RenderTarget &renderTarget) const {
   convex.setOutlineThickness(1);
   renderTarget.draw(convex);
 }
+
+void Wall::getImpacted(Entity &entity) {}
+void Wall::getImpacted(Player &player) {}
+void Wall::getImpacted(Ball &ball) { ball.bounce(); }

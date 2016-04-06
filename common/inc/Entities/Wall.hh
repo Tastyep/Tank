@@ -14,6 +14,9 @@ public:
   Wall &operator=(Wall &&other) = default;
 
   bool intersect(const Entity &ent) const;
+  void getImpacted(Entity &entity);
+  void getImpacted(Ball &entity);
+  void getImpacted(Player &player);
   void draw(sf::RenderTarget &renderTarget) const;
 };
 

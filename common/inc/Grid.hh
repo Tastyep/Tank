@@ -15,7 +15,7 @@ public:
   Grid &operator=(Grid &&other) = default;
 
   Cell &getCell(int x, int y);
-  bool checkCollision(const Entity &entity);
+  bool checkCollision(Movable &entity);
   int getHeight() const;
   int getWidth() const;
   void processQueue();

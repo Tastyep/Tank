@@ -7,7 +7,7 @@ Grid::Grid(int width, int height) : width(width), height(height) {
     cell.resize(width);
 }
 
-bool Grid::checkCollision(const Entity &entity) {
+bool Grid::checkCollision(Movable &entity) {
   SpriteCollision spriteBound = entity.getSpriteCollisionObject();
   const Rectangle &rect = spriteBound.getBound();
   const auto &edges = rect.getEdges();
@@ -28,17 +28,19 @@ bool Grid::checkCollision(const Entity &entity) {
     auto &entities = cell.getObjects();
     auto &updatableEntities = cell.getMovableObjects();
 
-    for (const auto &ent : entities) {
-      if (&entity == ent.get())
+    for (auto &ent : entities) {
+      if (&entity == ent.get() || !ent->isAlive())
         continue;
       if (entity.intersect(ent)) {
+        entity.impact(ent);
         return true;
       }
     }
-    for (const auto &ent : updatableEntities) {
-      if (&entity == ent.get())
+    for (auto &ent : updatableEntities) {
+      if (&entity == ent.get() || !ent->isAlive())
         continue;
       if (entity.intersect(ent)) {
+        entity.impact(ent);
         return true;
       }
     }

@@ -8,6 +8,9 @@
 #include <SFML/Graphics.hpp>
 #include <memory>
 
+class Ball;
+class Player;
+
 class Entity {
 public:
   static constexpr auto pi = std::acos(-1);
@@ -23,6 +26,9 @@ public:
   Entity &operator=(Entity &&other) = default;
 
   virtual void draw(sf::RenderTarget &renderTarget) const = 0;
+  virtual void getImpacted(Entity &entity) = 0;
+  virtual void getImpacted(Ball &ball);
+  virtual void getImpacted(Player &player);
 
   virtual bool intersect(std::shared_ptr<Entity> ent) const;
   const Position &getPosition() const;
@@ -32,12 +38,15 @@ public:
   void applyRotation(double angle);
   void setSpriteCollisionObject(const SpriteCollision &spriteBound);
   const SpriteCollision &getSpriteCollisionObject() const;
+  bool isAlive() const;
+  void setDead();
 
 protected:
   Position position;
   sf::Sprite sprite;
   SpriteCollision spriteBound;
   double angle;
+  bool alive;
 };
 
 #endif /* end of include guard: TANK_ENTITY_HPP */
