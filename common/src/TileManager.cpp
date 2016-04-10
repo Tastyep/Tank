@@ -21,8 +21,7 @@ TileManager::TileManager(unsigned int tileSize) : tileSize(tileSize) {
       sf::Sprite sprite(*gameTexture,
                         sf::IntRect(x, y, this->tileSize, this->tileSize));
       this->gameTiles.push_back(sprite);
-      this->spriteCollisions.emplace_back();
-      this->spriteCollisions.back().computeBounds(sprite);
+      this->spriteCollisions.emplace_back(sprite);
       ++tileId;
     }
   }

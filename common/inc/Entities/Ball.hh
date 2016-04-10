@@ -3,6 +3,8 @@
 
 #include "Movable.hh"
 
+class Wall;
+
 class Ball : public Movable {
 public:
   Ball(const sf::Sprite &sprite);
@@ -15,9 +17,9 @@ public:
 
   void update(Grid &grid, std::chrono::nanoseconds time);
   void getImpacted(Entity &entity);
-  void getImpacted(Player &player);
   void impact(std::shared_ptr<Entity> entity);
   void bounce();
+  void computeReflectedDirection(const Wall &wall);
 
 private:
   virtual void displace(int side, std::chrono::nanoseconds time, Grid &grid);

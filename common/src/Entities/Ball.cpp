@@ -1,5 +1,6 @@
 #include "Entities/Ball.hh"
 #include "Entities/Player.hh"
+#include "Entities/Wall.hh"
 #include "Grid.hh"
 #include <iostream>
 
@@ -26,7 +27,6 @@ void Ball::update(Grid &grid, std::chrono::nanoseconds time) {
 }
 
 void Ball::getImpacted(Entity &entity) {}
-void Ball::getImpacted(Player &player) {}
 
 void Ball::impact(std::shared_ptr<Entity> entity) {
   entity->getImpacted(*this);
@@ -36,4 +36,10 @@ void Ball::bounce() {
   ++this->bounceCount;
   if (this->bounceCount > this->maxBounce)
     this->alive = false;
+}
+
+void Ball::computeReflectedDirection(const Wall &wall) {
+  const auto &wallBound = wall.getSpriteCollisionObject().getBound().getEdges();
+
+  std::cout << wallBound[0].x << " " << wallBound[0].y << "\n";
 }
