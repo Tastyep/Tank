@@ -20,7 +20,7 @@ public:
   void rotate(double angle);
   const Rectangle &getBound() const;
   bool intersects(const SpriteCollision &spriteCollision) const;
-  VerticesCalculator getVerticesCalculator() const {
+  const VerticesCalculator &getVerticesCalculator() const {
     return this->verticesCalculator;
   };
 

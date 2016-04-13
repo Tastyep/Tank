@@ -40,12 +40,17 @@ SpriteCollision::SpriteCollision(const sf::Sprite &sprite)
 
 void SpriteCollision::translate(const Position &pos) {
   this->spriteBound.setPosition(pos);
+  this->verticesCalculator.setPosition(pos);
 }
 
-void SpriteCollision::rotate(double angle) { this->spriteBound.rotate(angle); }
+void SpriteCollision::rotate(double angle) {
+  this->spriteBound.rotate(angle);
+  this->verticesCalculator.rotate(angle);
+}
 
 void SpriteCollision::move(const sf::Vector2f &displacement) {
   this->spriteBound.move(displacement);
+  this->verticesCalculator.move(displacement);
 }
 
 const Rectangle &SpriteCollision::getBound() const { return this->spriteBound; }

@@ -38,16 +38,15 @@ void Movable::displace(int side, std::chrono::nanoseconds time, Grid &grid) {
 
 void Movable::draw(sf::RenderTarget &renderTarget) const {
   renderTarget.draw(this->sprite);
-  auto edges = this->spriteBound.getBound().getEdges();
+  const auto &vertices = spriteBound.getVerticesCalculator().getVertices();
+  sf::VertexArray varray(sf::LinesStrip);
 
-  sf::ConvexShape convex(4);
-  for (unsigned int i = 0; i < edges.size(); ++i) {
-    convex.setPoint(i, sf::Vector2f(edges[i].x, edges[i].y));
+  for (const auto &vertice : vertices) {
+    // std::cout << vertice.x << " " << vertice.y << "\n";
+    varray.append(sf::Vertex(sf::Vector2f(vertice.x, vertice.y),
+                             sf::Color(255, 255, 255)));
   }
-  convex.setFillColor(sf::Color(0, 0, 0, 0));
-  convex.setOutlineColor(sf::Color(255, 255, 255));
-  convex.setOutlineThickness(1);
-  renderTarget.draw(convex);
+  renderTarget.draw(varray);
 }
 
 void Movable::setDirection(const sf::Vector2f direction) {

@@ -1,6 +1,7 @@
 #ifndef TANK_VERTICESCALCULATOR_HH
 #define TANK_VERTICESCALCULATOR_HH
 
+#include "Position.hpp"
 #include <SFML/Graphics.hpp>
 #include <array>
 #include <vector>
@@ -8,6 +9,8 @@
 class VerticesCalculator {
 private:
   enum StepDirection { None, N, W, S, E };
+  static constexpr auto pi = std::acos(-1);
+  static constexpr float maxAngle = 10;
 
 public:
   VerticesCalculator() = default;
@@ -21,8 +24,10 @@ public:
     this->nextStep = other.nextStep;
     this->directions = other.directions;
     this->data = other.data;
-    this->width = other.width;
-    this->height = other.height;
+    this->bound = other.bound;
+    this->contour = other.contour;
+    this->vertices = other.vertices;
+    this->position = other.position;
     return *this;
   };
   VerticesCalculator &operator=(VerticesCalculator &&other) {
@@ -30,13 +35,18 @@ public:
     this->nextStep = other.nextStep;
     this->directions = other.directions;
     this->data = other.data;
-    this->width = other.width;
-    this->height = other.height;
+    this->bound = other.bound;
+    this->contour = other.contour;
+    this->vertices = other.vertices;
+    this->position = other.position;
     return *this;
   };
 
   void computeVertices();
-  sf::VertexArray getLines() const;
+  const std::vector<sf::Vector2f> &getVertices() const;
+  void move(const sf::Vector2f &displacement);
+  void setPosition(const Position &pos);
+  void rotate(double angle);
 
 private:
   sf::Vector2i findStartPoint();
@@ -44,16 +54,18 @@ private:
   void step(int x, int y);
   bool isPixelSolid(int x, int y) const;
   int getPixelState(int x, int y) const;
+  void removeSteps();
+  void polygonize();
 
 private:
-  sf::VertexArray lines;
   StepDirection previousStep;
   StepDirection nextStep;
   std::array<StepDirection, 16> directions;
-  std::vector<sf::Vector2i> contour;
+  std::vector<sf::Vector2f> contour;
+  std::vector<sf::Vector2f> vertices;
   sf::Image data;
-  int width;
-  int height;
+  sf::IntRect bound;
+  Position position;
 };
 
 #endif /* end of include guard: TANK_VERTICESCALCULATOR_HH */
