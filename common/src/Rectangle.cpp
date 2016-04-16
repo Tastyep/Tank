@@ -47,16 +47,23 @@ void Rectangle::rotate(double angle) {
       this->edges[0].y + (this->edges[2].y - this->edges[0].y) / 2.f);
 
   for (auto &edge : this->edges) {
-    copy = edge - position;
+    copy.x = edge.x - position.x;
+    copy.y = edge.y - position.y;
     edge.x = copy.x * cs - copy.y * sn;
     edge.y = copy.x * sn + copy.y * cs;
     edge += position;
   }
 }
 
+// bool Rectangle::centerInRect(const std::array<>& edges) const {
+//   sf::Vector2f AB = {}
+// }
+
 bool Rectangle::intersects(const Rectangle &rect) const {
   const auto &edges = rect.getEdges();
-
+  //
+  // if (this->centerInRect(edges))
+  //   return true;
   for (int rectId = 0; rectId < 2; ++rectId) {
     const auto &cuEdges = (rectId == 0 ? this->edges : edges);
 

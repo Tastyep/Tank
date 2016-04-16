@@ -56,5 +56,15 @@ void SpriteCollision::move(const sf::Vector2f &displacement) {
 const Rectangle &SpriteCollision::getBound() const { return this->spriteBound; }
 
 bool SpriteCollision::intersects(const SpriteCollision &spriteCollision) const {
-  return this->spriteBound.intersects(spriteCollision.getBound());
+  if (this->spriteBound.intersects(spriteCollision.getBound())) {
+    if (this->verticesCalculator.intersects(
+            spriteCollision.getVerticesCalculator().getVertices())) {
+      std::cout << "intersects"
+                << "\n";
+      return true;
+    } else
+      std::cout << "DONT intersects"
+                << "\n";
+  }
+  return false;
 }

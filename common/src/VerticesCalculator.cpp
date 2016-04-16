@@ -27,15 +27,31 @@ void VerticesCalculator::computeVertices() {
   this->walkPerimeter(start.x, start.y);
   this->removeSteps();
   this->polygonize();
+  this->triangulate();
+}
+
+void VerticesCalculator::triangulate() {
+  std::array<Position, 3> ear;
+  bool success;
+
+  do {
+    auto pair = this->triangulation.getEar(this->vertices);
+    success = pair.first;
+    ear = pair.second;
+    if (success) {
+      std::cout << ear[0] << " " << ear[1] << " " << ear[2] << std::endl;
+    }
+  } while (success);
+  std::cout << std::endl;
 }
 
 void VerticesCalculator::polygonize() {
-  sf::Vector2f first;
+  Position first;
+  Position prev;
+  Position cu;
   sf::Vector2f direction;
   sf::Vector2f cuDirection;
-  sf::Vector2f prev;
-  sf::Vector2f cu;
-  std::pair<sf::Vector2f, sf::Vector2f> inter;
+  std::pair<Position, Position> inter;
   int interId = 0;
   bool newInter = true;
   int length = 0;
@@ -43,7 +59,6 @@ void VerticesCalculator::polygonize() {
   float norme;
   float angle;
   bool converted = false;
-  std::cout << std::endl;
   int i = 0;
 
   while (!converted) {
@@ -51,8 +66,6 @@ void VerticesCalculator::polygonize() {
     // std::cout << "Cu: " << cu.x << " " << cu.y << "\n";
     if (this->vertices.empty()) {
       first = cu;
-      std::cout << "PUSH: " << first.x << " " << first.y << " "
-                << "\n";
 
       this->vertices.push_back(first);
       length = 1;
@@ -86,8 +99,6 @@ void VerticesCalculator::polygonize() {
         // std::cout << prev.x << " " << prev.y << " | " << cu.x << " " << cu.y
         //           << " angle: " << angle << "\n";
         if (angle > VerticesCalculator::maxAngle) {
-          std::cout << "PUSH: " << inter.first.x << " " << inter.first.y << " "
-                    << (inter.first == this->vertices.front()) << "\n";
           if (inter.first == this->vertices.front())
             converted = true;
           else {
@@ -113,13 +124,13 @@ void VerticesCalculator::polygonize() {
 }
 
 void VerticesCalculator::removeSteps() {
-  std::vector<sf::Vector2f> toRemove;
+  std::vector<Position> toRemove;
   bool prevDeleted = false;
 
   for (int i = 0; i < static_cast<int>(this->contour.size()); ++i) {
-    const sf::Vector2f &prev =
+    const Position &prev =
         this->contour[(this->contour.size() + i - 1) % this->contour.size()];
-    const sf::Vector2f &next = this->contour[(i + 1) % this->contour.size()];
+    const Position &next = this->contour[(i + 1) % this->contour.size()];
     if (prevDeleted == true) {
       prevDeleted = false;
       continue;
@@ -133,7 +144,7 @@ void VerticesCalculator::removeSteps() {
   }
   this->contour.erase(
       std::remove_if(this->contour.begin(), this->contour.end(),
-                     [&toRemove](const sf::Vector2f &point) {
+                     [&toRemove](const Position &point) {
                        return (std::find(toRemove.begin(), toRemove.end(),
                                          point) != toRemove.end());
                      }),
@@ -229,6 +240,43 @@ void VerticesCalculator::move(const sf::Vector2f &displacement) {
   }
 }
 
+bool VerticesCalculator::intersects(const std::vector<Position> &points) const {
+
+  for (int polygonId = 0; polygonId < 2; ++polygonId) {
+    const auto &cuPoints = (polygonId == 0 ? this->vertices : points);
+
+    for (unsigned int i = 0; i < cuPoints.size(); ++i) {
+      int j = (i + 1) % cuPoints.size();
+      sf::Vector2f normal(cuPoints[j].y - cuPoints[i].y,
+                          cuPoints[i].x - cuPoints[j].x);
+      double minA = std::numeric_limits<double>::max();
+      double minB = std::numeric_limits<double>::max();
+      double maxA = std::numeric_limits<double>::min();
+      double maxB = std::numeric_limits<double>::min();
+
+      for (const auto &point : this->vertices) {
+        double projected = normal.x * point.x + normal.y * point.y;
+
+        if (projected < minA)
+          minA = projected;
+        if (projected > maxA)
+          maxA = projected;
+      }
+      for (const auto &point : points) {
+        double projected = normal.x * point.x + normal.y * point.y;
+
+        if (projected < minB)
+          minB = projected;
+        if (projected > maxB)
+          maxB = projected;
+      }
+      if (maxA < minB || maxB < minA)
+        return false;
+    }
+  }
+  return true;
+}
+
 void VerticesCalculator::setPosition(const Position &pos) {
   Position allignedPos = pos;
   this->position = pos;
@@ -258,6 +306,6 @@ void VerticesCalculator::rotate(double angle) {
   }
 }
 
-const std::vector<sf::Vector2f> &VerticesCalculator::getVertices() const {
+const std::vector<Position> &VerticesCalculator::getVertices() const {
   return this->vertices;
 }
