@@ -59,6 +59,7 @@ private:
   void removeSteps();
   void polygonize();
   void triangulate();
+  void mergeTriangles(std::vector<Polygon> &polygons);
 
 private:
   StepDirection previousStep;

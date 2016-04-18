@@ -30,19 +30,94 @@ void VerticesCalculator::computeVertices() {
   this->triangulate();
 }
 
+void VerticesCalculator::mergeTriangles(std::vector<Polygon> &polygons) {
+  while (!polygons.empty()) {
+    for (int i = 0; i < static_cast<int>(polygons.size()); ++i) {
+      auto &polygon = polygons[i];
+
+      for (int v = 0; v < static_cast<int>(polygon.size()); ++v) {
+        int next = (v + 1) % polygon.size();
+
+        if (v == 0) {
+          std::cout << "Test polygon: "
+                    << "\n";
+
+          std::cout << polygon << "\n";
+        }
+        auto it = std::find_if(
+            polygons.begin(), polygons.end(),
+            [&polygon, v, next](const auto &cuPolygon) {
+              return (&cuPolygon != &polygon &&
+                      cuPolygon.hasFace(polygon[v], polygon[next]));
+            });
+        if (it != polygons.end()) {
+          std::cout << "Has common face: " << v << " " << next << " with :"
+                    << "\n";
+          std::cout << (*it) << "\n";
+          int fIdx = it->getVerticeIdx(polygon[next]);
+          int sIdx = it->getVerticeIdx(polygon[v]);
+          Triangle bottom({polygon[v - 1], polygon[v], (*it)[sIdx + 1]});
+          Triangle top({polygon[next + 1], polygon[next], (*it)[fIdx - 1]});
+
+          std::cout << "isConvex: " << (int)top.isConvex() << "  "
+                    << (int)bottom.isConvex() << "\n";
+
+          if (top.isConvex() &&
+              bottom.isConvex()) { // resulting polygon will be convex too
+            const auto &vertices = polygon.getVertices();
+            std::vector<Position> newVertices(vertices.begin(),
+                                              vertices.begin() + v + 1);
+
+            // std::cout << "NEWv"
+            //           << "\n";
+            // for (auto io : newVertices)
+            //   std::cout << io << "\n";
+            std::cout << "expand: "
+                      << "\n";
+            for (auto &vertice : vertices)
+              std::cout << vertice << "\n";
+            std::cout << " with: " << std::endl;
+            sIdx = (sIdx + 1) % it->size();
+            while (sIdx != fIdx) {
+              std::cout << (*it)[sIdx] << "\n";
+              newVertices.push_back((*it)[sIdx]);
+              sIdx = (sIdx + 1) % it->size();
+            }
+            // Insert points after next
+            if (next > v)
+              newVertices.insert(newVertices.end(), vertices.begin() + next,
+                                 vertices.end());
+            std::cout << "\n";
+            // Replace the polygon's vertices by newVertices
+            polygon << newVertices;
+            // Try again to expand the polygon
+            v = -1;
+            // Remove the emrged polygon
+            polygons.erase(it);
+          }
+        }
+      }
+      polygons.erase(std::find_if(
+          polygons.begin(), polygons.end(), [&polygon](const Polygon &p) {
+            return std::addressof(p) == std::addressof(polygon);
+          }));
+    }
+  }
+  getchar();
+}
+
 void VerticesCalculator::triangulate() {
-  std::array<Position, 3> ear;
+  std::vector<Polygon> triangles;
   bool success;
 
   do {
     auto pair = this->triangulation.getEar(this->vertices);
     success = pair.first;
-    ear = pair.second;
     if (success) {
-      std::cout << ear[0] << " " << ear[1] << " " << ear[2] << std::endl;
+      triangles.push_back(pair.second);
     }
   } while (success);
-  std::cout << std::endl;
+  // this->mergeTriangles(triangles);
 }
 
 void VerticesCalculator::polygonize() {
@@ -96,8 +171,6 @@ void VerticesCalculator::polygonize() {
                       cuDirection.y * cuDirection.y);
         angle =
             std::acos(dotProduct / norme) * (180.f / VerticesCalculator::pi);
-        // std::cout << prev.x << " " << prev.y << " | " << cu.x << " " << cu.y
-        //           << " angle: " << angle << "\n";
         if (angle > VerticesCalculator::maxAngle) {
           if (inter.first == this->vertices.front())
             converted = true;
@@ -106,9 +179,6 @@ void VerticesCalculator::polygonize() {
             newInter = true;
             first = inter.second;
             direction = inter.second - inter.first;
-            //   std::cout << "New direction: " << direction.x << " " <<
-            //   direction.y
-            //             << "\n";
             length = 1;
             i = interId;
             cu = this->contour[i];
