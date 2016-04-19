@@ -29,6 +29,7 @@ public:
     this->contour = other.contour;
     this->vertices = other.vertices;
     this->position = other.position;
+    this->polygons = other.polygons;
     return *this;
   };
   VerticesCalculator &operator=(VerticesCalculator &&other) {
@@ -40,6 +41,7 @@ public:
     this->contour = other.contour;
     this->vertices = other.vertices;
     this->position = other.position;
+    this->polygons = other.polygons;
     return *this;
   };
 
@@ -48,7 +50,7 @@ public:
   void move(const sf::Vector2f &displacement);
   void setPosition(const Position &pos);
   void rotate(double angle);
-  bool intersects(const std::vector<Position> &points) const;
+  bool intersects(const std::vector<Polygon> &polygons) const;
   const std::vector<Polygon> &getPolygons() const;
 
 private:
@@ -61,6 +63,7 @@ private:
   void polygonize();
   void triangulate();
   void mergeTriangles(std::vector<Polygon> &polygons);
+  bool intersects(const Polygon &polygonA, const Polygon &polygonB) const;
 
 private:
   StepDirection previousStep;

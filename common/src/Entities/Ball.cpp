@@ -40,6 +40,4 @@ void Ball::bounce() {
 
 void Ball::computeReflectedDirection(const Wall &wall) {
   const auto &wallBound = wall.getSpriteCollisionObject().getBound().getEdges();
-
-  std::cout << wallBound[0].x << " " << wallBound[0].y << "\n";
 }

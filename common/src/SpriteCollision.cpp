@@ -58,13 +58,9 @@ const Rectangle &SpriteCollision::getBound() const { return this->spriteBound; }
 bool SpriteCollision::intersects(const SpriteCollision &spriteCollision) const {
   if (this->spriteBound.intersects(spriteCollision.getBound())) {
     if (this->verticesCalculator.intersects(
-            spriteCollision.getVerticesCalculator().getVertices())) {
-      std::cout << "intersects"
-                << "\n";
+            spriteCollision.getVerticesCalculator().getPolygons())) {
       return true;
-    } else
-      std::cout << "DONT intersects"
-                << "\n";
+    }
   }
   return false;
 }
