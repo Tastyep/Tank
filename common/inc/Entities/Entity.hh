@@ -30,7 +30,7 @@ public:
   virtual void getImpacted(Ball &ball);
   virtual void getImpacted(Player &player);
 
-  virtual bool intersect(std::shared_ptr<Entity> ent) const;
+  virtual bool intersects(std::shared_ptr<Entity> ent) const;
   const Position &getPosition() const;
   const sf::Sprite &getSprite() const;
   void setPosition(Position pos);

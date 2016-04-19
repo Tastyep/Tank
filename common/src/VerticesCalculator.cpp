@@ -38,12 +38,12 @@ void VerticesCalculator::mergeTriangles(std::vector<Polygon> &polygons) {
       for (int v = 0; v < static_cast<int>(polygon.size()); ++v) {
         int next = (v + 1) % polygon.size();
 
-        if (v == 0) {
-          std::cout << "Test polygon: "
-                    << "\n";
-
-          std::cout << polygon << "\n";
-        }
+        // if (v == 0) {
+        //   std::cout << "Test polygon: "
+        //             << "\n";
+        //
+        //   std::cout << polygon << "\n";
+        // }
         auto it = std::find_if(
             polygons.begin(), polygons.end(),
             [&polygon, v, next](const auto &cuPolygon) {
@@ -51,19 +51,26 @@ void VerticesCalculator::mergeTriangles(std::vector<Polygon> &polygons) {
                       cuPolygon.hasFace(polygon[v], polygon[next]));
             });
         if (it != polygons.end()) {
-          std::cout << "Has common face: " << v << " " << next << " with :"
-                    << "\n";
-          std::cout << (*it) << "\n";
+          //   std::cout << "Has common face: " << v << " " << next << " with :"
+          //             << "\n";
+          //   std::cout << (*it) << "\n";
           int fIdx = it->getVerticeIdx(polygon[next]);
           int sIdx = it->getVerticeIdx(polygon[v]);
-          Triangle bottom({polygon[v - 1], polygon[v], (*it)[sIdx + 1]});
-          Triangle top({polygon[next + 1], polygon[next], (*it)[fIdx - 1]});
+          Triangle top({polygon[v - 1], polygon[v], (*it)[sIdx + 1]});
+          Triangle bottom({(*it)[fIdx - 1], polygon[next], polygon[next + 1]});
 
-          std::cout << "isConvex: " << (int)top.isConvex() << "  "
-                    << (int)bottom.isConvex() << "\n";
+          //   std::cout << "Top: " << std::endl;
+          //   std::cout << top << "\n";
+          //   std::cout << "Bottom: " << std::endl;
+          //   std::cout << bottom << "\n";
 
-          if (top.isConvex() &&
-              bottom.isConvex()) { // resulting polygon will be convex too
+          bool topConvex = top.isConvex();
+          bool bottomConvex = bottom.isConvex();
+          //   std::cout << "isConvex: " << (int)topConvex << "  "
+          //             << (int)bottomConvex << "\n";
+
+          if (topConvex &&
+              bottomConvex) { // resulting polygon will be convex too
             const auto &vertices = polygon.getVertices();
             std::vector<Position> newVertices(vertices.begin(),
                                               vertices.begin() + v + 1);
@@ -72,14 +79,14 @@ void VerticesCalculator::mergeTriangles(std::vector<Polygon> &polygons) {
             //           << "\n";
             // for (auto io : newVertices)
             //   std::cout << io << "\n";
-            std::cout << "expand: "
-                      << "\n";
-            for (auto &vertice : vertices)
-              std::cout << vertice << "\n";
-            std::cout << " with: " << std::endl;
+            // std::cout << "expand: "
+            //           << "\n";
+            // for (auto &vertice : vertices)
+            //   std::cout << vertice << "\n";
+            // std::cout << " with: " << std::endl;
             sIdx = (sIdx + 1) % it->size();
             while (sIdx != fIdx) {
-              std::cout << (*it)[sIdx] << "\n";
+              //   std::cout << (*it)[sIdx] << "\n";
               newVertices.push_back((*it)[sIdx]);
               sIdx = (sIdx + 1) % it->size();
             }
@@ -97,13 +104,14 @@ void VerticesCalculator::mergeTriangles(std::vector<Polygon> &polygons) {
           }
         }
       }
+      this->polygons.push_back(polygon);
+      std::cout << "Polygon: " << polygon << "\n";
       polygons.erase(std::find_if(
           polygons.begin(), polygons.end(), [&polygon](const Polygon &p) {
             return std::addressof(p) == std::addressof(polygon);
           }));
     }
   }
-  getchar();
 }
 
 void VerticesCalculator::triangulate() {
@@ -117,7 +125,7 @@ void VerticesCalculator::triangulate() {
       triangles.push_back(pair.second);
     }
   } while (success);
-  // this->mergeTriangles(triangles);
+  this->mergeTriangles(triangles);
 }
 
 void VerticesCalculator::polygonize() {
@@ -305,43 +313,48 @@ bool VerticesCalculator::isPixelSolid(int x, int y) const {
 void VerticesCalculator::move(const sf::Vector2f &displacement) {
   this->position.x += displacement.x;
   this->position.y += displacement.y;
-  for (auto &point : this->vertices) {
-    point += displacement;
+  for (auto &polygon : this->polygons) {
+    for (auto &point : polygon.getVertices()) {
+      point += displacement;
+    }
   }
 }
 
 bool VerticesCalculator::intersects(const std::vector<Position> &points) const {
 
   for (int polygonId = 0; polygonId < 2; ++polygonId) {
-    const auto &cuPoints = (polygonId == 0 ? this->vertices : points);
+    for (const Polygon &polygon : this->polygons) {
+      const auto &cuPoints = (polygonId == 0 ? polygon.getVertices() : points);
+      for (unsigned int i = 0; i < cuPoints.size(); ++i) {
+        int j = (i + 1) % cuPoints.size();
+        sf::Vector2f normal(cuPoints[j].y - cuPoints[i].y,
+                            cuPoints[i].x - cuPoints[j].x);
+        double minA = std::numeric_limits<double>::max();
+        double minB = std::numeric_limits<double>::max();
+        double maxA = std::numeric_limits<double>::min();
+        double maxB = std::numeric_limits<double>::min();
 
-    for (unsigned int i = 0; i < cuPoints.size(); ++i) {
-      int j = (i + 1) % cuPoints.size();
-      sf::Vector2f normal(cuPoints[j].y - cuPoints[i].y,
-                          cuPoints[i].x - cuPoints[j].x);
-      double minA = std::numeric_limits<double>::max();
-      double minB = std::numeric_limits<double>::max();
-      double maxA = std::numeric_limits<double>::min();
-      double maxB = std::numeric_limits<double>::min();
+        for (const auto &polygon : this->polygons) {
+          for (const auto &point : polygon.getVertices()) {
+            double projected = normal.x * point.x + normal.y * point.y;
 
-      for (const auto &point : this->vertices) {
-        double projected = normal.x * point.x + normal.y * point.y;
+            if (projected < minA)
+              minA = projected;
+            if (projected > maxA)
+              maxA = projected;
+          }
+        }
+        for (const auto &point : points) {
+          double projected = normal.x * point.x + normal.y * point.y;
 
-        if (projected < minA)
-          minA = projected;
-        if (projected > maxA)
-          maxA = projected;
+          if (projected < minB)
+            minB = projected;
+          if (projected > maxB)
+            maxB = projected;
+        }
+        if (maxA < minB || maxB < minA)
+          return false;
       }
-      for (const auto &point : points) {
-        double projected = normal.x * point.x + normal.y * point.y;
-
-        if (projected < minB)
-          minB = projected;
-        if (projected > maxB)
-          maxB = projected;
-      }
-      if (maxA < minB || maxB < minA)
-        return false;
     }
   }
   return true;
@@ -353,10 +366,11 @@ void VerticesCalculator::setPosition(const Position &pos) {
 
   allignedPos.x -= this->bound.width / 2;
   allignedPos.y -= this->bound.height / 2;
-
-  for (auto &point : this->vertices) {
-    point.x += allignedPos.x;
-    point.y += allignedPos.y;
+  for (auto &polygon : this->polygons) {
+    for (auto &point : polygon.getVertices()) {
+      point.x += allignedPos.x;
+      point.y += allignedPos.y;
+    }
   }
 }
 
@@ -366,16 +380,22 @@ void VerticesCalculator::rotate(double angle) {
   double cs = std::cos(angle);
   double sn = std::sin(angle);
 
-  for (auto &point : this->vertices) {
-    copy.x = point.x - this->position.x;
-    copy.y = point.y - this->position.y;
-    point.x = copy.x * cs - copy.y * sn;
-    point.y = copy.x * sn + copy.y * cs;
-    point.x += this->position.x;
-    point.y += this->position.y;
+  for (auto &polygon : this->polygons) {
+    for (auto &point : polygon.getVertices()) {
+      copy.x = point.x - this->position.x;
+      copy.y = point.y - this->position.y;
+      point.x = copy.x * cs - copy.y * sn;
+      point.y = copy.x * sn + copy.y * cs;
+      point.x += this->position.x;
+      point.y += this->position.y;
+    }
   }
 }
 
 const std::vector<Position> &VerticesCalculator::getVertices() const {
   return this->vertices;
+}
+
+const std::vector<Polygon> &VerticesCalculator::getPolygons() const {
+  return this->polygons;
 }

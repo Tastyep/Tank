@@ -49,6 +49,7 @@ public:
   void setPosition(const Position &pos);
   void rotate(double angle);
   bool intersects(const std::vector<Position> &points) const;
+  const std::vector<Polygon> &getPolygons() const;
 
 private:
   sf::Vector2i findStartPoint();
@@ -71,6 +72,7 @@ private:
   sf::IntRect bound;
   Position position;
   Triangulation triangulation;
+  std::vector<Polygon> polygons;
 };
 
 #endif /* end of include guard: TANK_VERTICESCALCULATOR_HH */

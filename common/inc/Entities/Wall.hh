@@ -13,7 +13,7 @@ public:
   Wall &operator=(const Wall &other) = default;
   Wall &operator=(Wall &&other) = default;
 
-  bool intersect(const Entity &ent) const;
+  bool intersects(const Entity &ent) const;
   void getImpacted(Entity &entity);
   void getImpacted(Ball &entity);
   void getImpacted(Player &player);

@@ -24,6 +24,7 @@ public:
 
   bool isConvex() const;
   const std::vector<Position> &getVertices() const;
+  std::vector<Position> &getVertices();
   bool hasFace(const Position &a, const Position &b) const;
   int getVerticeIdx(const Position &vertice) const;
   unsigned int size() const;

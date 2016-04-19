@@ -29,8 +29,6 @@ bool Polygon::hasFace(const Position &a, const Position &b) const {
 bool Polygon::isConvex() const {
   float zProduct;
   float dx1, dy1, dx2, dy2;
-  bool set = false;
-  bool positive;
 
   for (unsigned int i = 0; i < this->vertices.size(); ++i) {
     auto &A = this->vertices[i];
@@ -43,11 +41,8 @@ bool Polygon::isConvex() const {
     dx2 = C.x - B.x;
     dy2 = C.y - B.y;
     zProduct = dx1 * dy2 - dy1 * dx2;
-    // std::cout << "zProduct: " << zProduct << "\n";
-    if (set == false && zProduct != 0) {
-      set = true;
-      positive = (zProduct > 0);
-    } else if (set == true && (zProduct > 0) != positive)
+
+    if (zProduct < 0)
       return false;
   }
   return true;
@@ -64,5 +59,6 @@ int Polygon::getVerticeIdx(const Position &vertice) const {
 const std::vector<Position> &Polygon::getVertices() const {
   return this->vertices;
 }
+std::vector<Position> &Polygon::getVertices() { return this->vertices; }
 
 unsigned int Polygon::size() const { return this->vertices.size(); }

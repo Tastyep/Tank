@@ -35,7 +35,7 @@ void Entity::applyRotation(double angle) {
   this->spriteBound.rotate(-angle);
 }
 
-bool Entity::intersect(std::shared_ptr<Entity> ent) const {
+bool Entity::intersects(std::shared_ptr<Entity> ent) const {
   return this->spriteBound.intersects(ent->getSpriteCollisionObject());
 }
 

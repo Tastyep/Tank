@@ -31,7 +31,7 @@ bool Grid::checkCollision(Movable &entity) {
     for (auto &ent : entities) {
       if (&entity == ent.get() || !ent->isAlive())
         continue;
-      if (entity.intersect(ent)) {
+      if (entity.intersects(ent)) {
         entity.impact(ent);
         return true;
       }
@@ -39,7 +39,7 @@ bool Grid::checkCollision(Movable &entity) {
     for (auto &ent : updatableEntities) {
       if (&entity == ent.get() || !ent->isAlive())
         continue;
-      if (entity.intersect(ent)) {
+      if (entity.intersects(ent)) {
         entity.impact(ent);
         return true;
       }
