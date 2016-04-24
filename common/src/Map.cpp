@@ -4,7 +4,13 @@
 
 #include <iostream>
 
-Map::Map(int width, int height) : maze(width, height), grid(width, height) {
+Map::Map(const ACvar &cvarList)
+    : maze(std::stoi(cvarList.getCvar("sv_mapX")),
+           std::stoi(cvarList.getCvar("sv_mapY")),
+           std::stoi(cvarList.getCvar("sv_mapLinearity")),
+           std::stoi(cvarList.getCvar("sv_mapDensity"))),
+      grid(std::stoi(cvarList.getCvar("sv_mapX")),
+           std::stoi(cvarList.getCvar("sv_mapY"))) {
   this->tileMap = {{{static_cast<int>(EntityId::WallFull),
                      static_cast<int>(EntityId::WallSquare), 0}}};
   this->entitySpawner = {[this](const sf::Sprite &sprite, int posX, int posY) {
@@ -96,8 +102,8 @@ void Map::convert(std::vector<std::vector<Maze::MazeElement>> mazeData,
   }
 }
 
-void Map::generate(const TileManager &tileManager) {
-  this->maze.generate(9);
+void Map::generate(const TileManager &tileManager, int seed) {
+  this->maze.generate(seed);
   this->convert(this->maze.getMap(), tileManager);
 }
 

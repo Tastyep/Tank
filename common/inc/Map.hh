@@ -1,6 +1,7 @@
 #ifndef TANK_MAP_HH
 #define TANK_MAP_HH
 
+#include "ACvar.hh"
 #include "Entities/Entity.hh"
 #include "Grid.hh"
 #include "IActionAnalyzer.hpp"
@@ -19,7 +20,7 @@ private:
   };
 
 public:
-  Map(int height, int width);
+  Map(const ACvar &cvarList);
 
   ~Map() = default;
   Map(const Map &other) = default;
@@ -27,7 +28,7 @@ public:
   Map &operator=(const Map &other) = default;
   Map &operator=(Map &&other) = default;
 
-  void generate(const TileManager &tileManager);
+  void generate(const TileManager &tileManager, int seed);
   void draw(sf::RenderTarget &renderTarget);
   void update(std::chrono::nanoseconds time);
 

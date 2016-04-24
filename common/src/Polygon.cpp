@@ -35,7 +35,6 @@ bool Polygon::isConvex() const {
     auto &B = this->vertices[(i + 1) % this->vertices.size()];
     auto &C = this->vertices[(i + 2) % this->vertices.size()];
 
-    // std::cout << "test " << A << " " << B << " " << C << "\n";
     dx1 = A.x - B.x;
     dy1 = A.y - B.y;
     dx2 = C.x - B.x;

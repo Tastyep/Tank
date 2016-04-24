@@ -15,4 +15,9 @@ CvarList::CvarList() {
                                   "127.0.0.1", String, Restriction::Value));
   addCvar("sv_masterPort",
           new Cvar({"25255"}, "25255", "25255", String, Restriction::Value));
+  addCvar("sv_mapX", new Cvar({"3", "40"}, "20", "20", Number));
+  addCvar("sv_mapY", new Cvar({"3", "40"}, "20", "20", Number));
+  addCvar("sv_mapLinearity", new Cvar({"0", "100"}, "80", "80", Number));
+  addCvar("sv_mapDensity", new Cvar({"0", "100"}, "80", "80", Number));
+  addCvar("sv_mapSeed", new Cvar({"0", "2147483647"}, "0", "0", Number));
 }

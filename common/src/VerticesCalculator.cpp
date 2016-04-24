@@ -278,7 +278,9 @@ bool VerticesCalculator::isPixelSolid(int x, int y) const {
   if (x < 0 || y < 0 || x >= this->bound.width || y >= this->bound.height)
     return false;
 
-  return (this->data.getPixel(x + bound.left, y + bound.top).a > 0);
+  // Compare it to 5 not 0 because sometimes the alpha is set to 1 or 2 but is
+  // not visible
+  return (this->data.getPixel(x + bound.left, y + bound.top).a > 5);
 }
 
 void VerticesCalculator::move(const sf::Vector2f &displacement) {
@@ -295,6 +297,7 @@ bool VerticesCalculator::intersects(const Polygon &polygonA,
                                     const Polygon &polygonB) const {
   const auto &verticesA = polygonA.getVertices();
   const auto &verticesB = polygonB.getVertices();
+  std::vector<std::array<double, 4>> debug;
 
   for (int id = 0; id < 2; ++id) {
     const auto &vertices = (id == 0 ? verticesA : verticesB);
@@ -324,6 +327,7 @@ bool VerticesCalculator::intersects(const Polygon &polygonA,
         if (projected > maxB)
           maxB = projected;
       }
+      debug.push_back({minA, minB, maxA, maxB});
       if (maxA < minB || maxB < minA)
         return false;
     }
