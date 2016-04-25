@@ -1,5 +1,6 @@
 #include "VerticesCalculator.hh"
 #include <cmath>
+#include <functional>
 #include <stdexcept>
 
 #include <iostream>
@@ -33,15 +34,14 @@ void VerticesCalculator::computeVertices() {
 void VerticesCalculator::mergeTriangles(std::vector<Polygon> &polygons) {
   while (!polygons.empty()) {
     for (int i = 0; i < static_cast<int>(polygons.size()); ++i) {
-      auto &polygon = polygons[i];
-
-      for (int v = 0; v < static_cast<int>(polygon.size()); ++v) {
+      for (int v = 0; v < static_cast<int>(polygons[i].size()); ++v) {
+        auto &polygon = polygons[i];
         int next = (v + 1) % polygon.size();
 
         auto it = std::find_if(
             polygons.begin(), polygons.end(),
             [&polygon, v, next](const auto &cuPolygon) {
-              return (&cuPolygon != &polygon &&
+              return (std::addressof(cuPolygon) != std::addressof(polygon) &&
                       cuPolygon.hasFace(polygon[v], polygon[next]));
             });
         if (it != polygons.end()) {
@@ -72,16 +72,17 @@ void VerticesCalculator::mergeTriangles(std::vector<Polygon> &polygons) {
             polygon << newVertices;
             // Try again to expand the polygon
             v = -1;
-            // Remove the emrged polygon
+            // Remove the merged polygon
             polygons.erase(it);
+            if (std::distance(polygons.begin(), it) <
+                i) { // If the point of erase is before our i
+              --i;
+            }
           }
         }
       }
-      this->polygons.push_back(polygon);
-      polygons.erase(std::find_if(
-          polygons.begin(), polygons.end(), [&polygon](const Polygon &p) {
-            return std::addressof(p) == std::addressof(polygon);
-          }));
+      this->polygons.push_back(polygons[i]);
+      polygons.erase(polygons.begin() + i);
     }
   }
 }
@@ -116,6 +117,8 @@ void VerticesCalculator::polygonize() {
   bool converted = false;
   int i = 0;
 
+  if (contour.size() < 2)
+    return;
   while (!converted) {
     cu = this->contour[i];
     if (this->vertices.empty()) {
@@ -172,24 +175,37 @@ void VerticesCalculator::polygonize() {
   this->contour.clear();
 }
 
+bool VerticesCalculator::isPixelBorder(const Position &pos) const {
+  bool top = this->isPixelSolid(pos.x, pos.y - 1);
+  bool right = this->isPixelSolid(pos.x + 1, pos.y);
+  bool down = this->isPixelSolid(pos.x, pos.y + 1);
+  bool left = this->isPixelSolid(pos.x - 1, pos.y);
+
+  return (!(top & right & down & left));
+}
+
 void VerticesCalculator::removeSteps() {
   std::vector<Position> toRemove;
-  bool prevDeleted = false;
+  int prev;
+  float dotProduct;
+  sf::Vector2f BA, BC;
 
+  prev = this->contour.size() - 1;
   for (int i = 0; i < static_cast<int>(this->contour.size()); ++i) {
-    const Position &prev =
-        this->contour[(this->contour.size() + i - 1) % this->contour.size()];
-    const Position &next = this->contour[(i + 1) % this->contour.size()];
-    if (prevDeleted == true) {
-      prevDeleted = false;
+    if (!this->isPixelBorder(
+            this->contour[i])) { // means the pixel has only non
+      // transparent pixel neighbors
+      toRemove.push_back(this->contour[i]);
       continue;
     }
-
-    sf::Vector2f direction = next - prev;
-    if (direction.x != 0 && direction.y != 0) { // means it is a diagonal
+    BA = this->contour[prev] - this->contour[i];
+    BC = this->contour[(i + 1) % this->contour.size()] - this->contour[i];
+    dotProduct = BA.x * BC.x + BA.y * BC.y;
+    if (dotProduct == 0) { // the two vectors are perpendicular, remove the edge
       toRemove.push_back(this->contour[i]);
-      prevDeleted = true;
+      continue;
     }
+    prev = i;
   }
   this->contour.erase(
       std::remove_if(this->contour.begin(), this->contour.end(),
@@ -252,10 +268,36 @@ int VerticesCalculator::getPixelState(int x, int y) const {
   return state;
 }
 
+void VerticesCalculator::allignOnSprite(int x, int y) {
+  if (this->isPixelSolid(x, y)) {
+    if (this->contour.empty() ||
+        (!this->contour.empty() && this->contour.back() != Position(x, y))) {
+      this->contour.emplace_back(x, y);
+    }
+  } else {
+    if (this->isPixelSolid(x + 1, y)) {
+      if (this->contour.empty() ||
+          (!this->contour.empty() &&
+           this->contour.back() != Position(x + 1, y) &&
+           this->contour.front() != Position(x + 1, y))) {
+        this->contour.emplace_back(x + 1, y);
+      }
+    }
+    if (this->isPixelSolid(x, y + 1)) {
+      if (this->contour.empty() ||
+          (!this->contour.empty() &&
+           this->contour.back() != Position(x, y + 1) &&
+           this->contour.front() != Position(x, y + 1))) {
+        this->contour.emplace_back(x, y + 1);
+      }
+    }
+  }
+}
+
 void VerticesCalculator::step(int x, int y) {
   int state = this->getPixelState(x, y);
 
-  this->contour.emplace_back(x, y);
+  this->allignOnSprite(x, y);
   switch (state) {
   case 6:
     this->nextStep =
@@ -274,13 +316,13 @@ void VerticesCalculator::step(int x, int y) {
   this->previousStep = this->nextStep;
 }
 
-bool VerticesCalculator::isPixelSolid(int x, int y) const {
+bool VerticesCalculator::isPixelSolid(int x, int y, bool out) const {
   if (x < 0 || y < 0 || x >= this->bound.width || y >= this->bound.height)
-    return false;
+    return out;
 
-  // Compare it to 5 not 0 because sometimes the alpha is set to 1 or 2 but is
+  // Compare it to 10 not 0 because sometimes the alpha is set to 1 or 2 but is
   // not visible
-  return (this->data.getPixel(x + bound.left, y + bound.top).a > 5);
+  return (this->data.getPixel(x + bound.left, y + bound.top).a > 10);
 }
 
 void VerticesCalculator::move(const sf::Vector2f &displacement) {
@@ -297,7 +339,6 @@ bool VerticesCalculator::intersects(const Polygon &polygonA,
                                     const Polygon &polygonB) const {
   const auto &verticesA = polygonA.getVertices();
   const auto &verticesB = polygonB.getVertices();
-  std::vector<std::array<double, 4>> debug;
 
   for (int id = 0; id < 2; ++id) {
     const auto &vertices = (id == 0 ? verticesA : verticesB);
@@ -327,7 +368,6 @@ bool VerticesCalculator::intersects(const Polygon &polygonA,
         if (projected > maxB)
           maxB = projected;
       }
-      debug.push_back({minA, minB, maxA, maxB});
       if (maxA < minB || maxB < minA)
         return false;
     }

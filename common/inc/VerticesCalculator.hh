@@ -57,13 +57,15 @@ private:
   sf::Vector2i findStartPoint();
   void walkPerimeter(int x, int y);
   void step(int x, int y);
-  bool isPixelSolid(int x, int y) const;
+  bool isPixelSolid(int x, int y, bool out = false) const;
+  bool isPixelBorder(const Position &pos) const;
   int getPixelState(int x, int y) const;
   void removeSteps();
   void polygonize();
   void triangulate();
   void mergeTriangles(std::vector<Polygon> &polygons);
   bool intersects(const Polygon &polygonA, const Polygon &polygonB) const;
+  void allignOnSprite(int x, int y);
 
 private:
   StepDirection previousStep;

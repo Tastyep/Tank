@@ -47,6 +47,12 @@ struct Position {
     this->x += pos.x;
     this->y += pos.y;
   }
+  bool operator==(const Position &pos) {
+    return pos.x == this->x && pos.y == this->y;
+  }
+  bool operator!=(const Position &pos) {
+    return pos.x != this->x || pos.y != this->y;
+  }
 };
 
 inline std::ostream &operator<<(std::ostream &stream, const Position &pos) {
