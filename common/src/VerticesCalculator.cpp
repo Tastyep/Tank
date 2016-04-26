@@ -220,11 +220,16 @@ sf::Vector2i VerticesCalculator::findStartPoint() {
   sf::Vector2i pos;
   int state;
 
-  for (pos.y = 0; pos.y < this->bound.height; ++pos.y) {
-    for (pos.x = 0; pos.x < this->bound.width; ++pos.x) {
-      state = this->getPixelState(pos.x, pos.y);
-      if (state != 0 && state != 15)
+  for (pos.y = 0; pos.y < this->bound.height - 1; ++pos.y) {
+    for (pos.x = 0; pos.x < this->bound.width - 1; ++pos.x) {
+      if (this->isPixelSolid(pos.x, pos.y) &&
+          !this->isPixelSolid(pos.x, pos.y - 1)) {
+        --pos.y;
         return pos;
+      }
+      if (this->isPixelSolid(pos.x + 1, pos.y)) {
+        return pos;
+      }
     }
   }
   return {0, 0};
@@ -288,6 +293,7 @@ void VerticesCalculator::allignOnSprite(int x, int y) {
           (!this->contour.empty() &&
            this->contour.back() != Position(x, y + 1) &&
            this->contour.front() != Position(x, y + 1))) {
+
         this->contour.emplace_back(x, y + 1);
       }
     }
