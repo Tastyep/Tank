@@ -1,8 +1,8 @@
 #include "SpriteCollision.hh"
 #include <iostream>
 
-SpriteCollision::SpriteCollision(const sf::Sprite &sprite)
-    : verticesCalculator(sprite) {
+SpriteCollision::SpriteCollision(const sf::Sprite &sprite, float maxFaceAngle)
+    : verticesCalculator(sprite, maxFaceAngle) {
   const sf::Texture *texture = sprite.getTexture();
   const sf::IntRect &rect = sprite.getTextureRect();
   sf::Image image = texture->copyToImage();

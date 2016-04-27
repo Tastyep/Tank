@@ -1,6 +1,7 @@
 #ifndef TANK_TILEMANAGER_HH_
 #define TANK_TILEMANAGER_HH_
 
+#include "ACvar.hh"
 #include "EntityId.hpp"
 #include "Position.hpp"
 #include "SpriteCollision.hh"
@@ -8,7 +9,7 @@
 
 class TileManager {
 public:
-  TileManager(unsigned int tileSize = 32);
+  TileManager(ACvar &cvarList, unsigned int tileSize = 32);
 
   ~TileManager() = default;
   TileManager(const TileManager &other) = default;

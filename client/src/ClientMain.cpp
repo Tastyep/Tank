@@ -2,8 +2,8 @@
 #include "TimeHandling.hpp"
 
 ClientMain::ClientMain(Settings &settings)
-    : settings(settings), parser(settings), tileManager(32),
-      game(settings, tileManager),
+    : settings(settings), parser(settings),
+      tileManager(settings.getCvarList(), 32), game(settings, tileManager),
       window(sf::VideoMode(
                  std::stoi(this->settings.getCvarList().getCvar("r_width")),
                  std::stoi(this->settings.getCvarList().getCvar("r_height"))),

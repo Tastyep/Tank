@@ -20,4 +20,5 @@ CvarList::CvarList() {
   addCvar("sv_mapLinearity", new Cvar({"0", "100"}, "80", "80", Number));
   addCvar("sv_mapDensity", new Cvar({"0", "100"}, "80", "80", Number));
   addCvar("sv_mapSeed", new Cvar({"0", "2147483647"}, "0", "0", Number));
+  addCvar("cg_maxFaceAngle", new Cvar({"5", "85"}, "10", "10", Number));
 }

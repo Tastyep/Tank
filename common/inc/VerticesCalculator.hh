@@ -11,11 +11,10 @@ class VerticesCalculator {
 private:
   enum StepDirection { None, N, W, S, E };
   static constexpr auto pi = std::acos(-1);
-  static constexpr float maxAngle = 10;
 
 public:
   VerticesCalculator() = default;
-  VerticesCalculator(const sf::Sprite &sprite);
+  VerticesCalculator(const sf::Sprite &sprite, float maxFaceAngle = 10);
 
   ~VerticesCalculator() = default;
   VerticesCalculator(const VerticesCalculator &other) = default;
@@ -68,6 +67,7 @@ private:
   void allignOnSprite(int x, int y);
 
 private:
+  float maxFaceAngle;
   StepDirection previousStep;
   StepDirection nextStep;
   std::array<StepDirection, 16> directions;

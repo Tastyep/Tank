@@ -3,11 +3,13 @@
 
 #include <iostream>
 
-TileManager::TileManager(unsigned int tileSize) : tileSize(tileSize) {
+TileManager::TileManager(ACvar &cvarList, unsigned int tileSize)
+    : tileSize(tileSize) {
   auto &tm = TextureManager<>::instance();
   unsigned int tileId = 0;
   unsigned int nbTile = static_cast<unsigned int>(
       EntityId::Empty); // Empty represents the last element
+  float maxFaceAngle = std::stof(cvarList.getCvar("cg_maxFaceAngle"));
 
   std::shared_ptr<sf::Texture> gameTexture =
       tm.load("../client/assets/asset.png", "GameAssets");
@@ -21,7 +23,7 @@ TileManager::TileManager(unsigned int tileSize) : tileSize(tileSize) {
       sf::Sprite sprite(*gameTexture,
                         sf::IntRect(x, y, this->tileSize, this->tileSize));
       this->gameTiles.push_back(sprite);
-      this->spriteCollisions.emplace_back(sprite);
+      this->spriteCollisions.emplace_back(sprite, maxFaceAngle);
       ++tileId;
     }
   }

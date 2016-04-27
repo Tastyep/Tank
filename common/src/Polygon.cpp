@@ -2,7 +2,22 @@
 #include <algorithm>
 #include <cmath>
 
-Polygon::Polygon(const std::vector<Position> &vertices) : vertices(vertices) {}
+Polygon::Polygon(const std::vector<Position> &vertices)
+    : vertices(vertices), originVertices(vertices) {
+  this->computeTranslation();
+}
+
+Polygon::Polygon(const Polygon &other) {
+  this->vertices = other.vertices;
+  this->originVertices = other.originVertices;
+  this->translation = other.translation;
+};
+
+void Polygon::operator=(const std::vector<Position> &vertices) {
+  this->vertices = vertices;
+  this->originVertices = vertices;
+  this->computeTranslation();
+};
 
 Position &Polygon::operator[](int idx) {
   if (idx < 0)
@@ -55,9 +70,39 @@ int Polygon::getVerticeIdx(const Position &vertice) const {
   return std::distance(this->vertices.begin(), it);
 }
 
+const std::vector<Position> &Polygon::getOriginVertices() const {
+  return this->originVertices;
+}
+
 const std::vector<Position> &Polygon::getVertices() const {
   return this->vertices;
 }
 std::vector<Position> &Polygon::getVertices() { return this->vertices; }
 
 unsigned int Polygon::size() const { return this->vertices.size(); }
+
+void Polygon::setPosition(const Position &position) {
+  unsigned int size = this->vertices.size();
+
+  for (unsigned int i = 0; i < size; ++i) {
+    vertices[i].x = originVertices[i].x + position.x;
+    vertices[i].y = originVertices[i].y + position.y;
+  }
+}
+
+void Polygon::computeTranslation() {
+  float minX = this->vertices.front().x;
+  float minY = this->vertices.front().y;
+
+  for (unsigned int i = 1; i < this->vertices.size(); ++i) {
+    if (this->vertices[i].x < minX)
+      minX = this->vertices[i].x;
+    if (this->vertices[i].y < minY)
+      minY = this->vertices[i].y;
+  }
+  this->translation = sf::Vector2f(minX, minY);
+}
+
+Position Polygon::getPosition() const {
+  return this->position + this->translation;
+}

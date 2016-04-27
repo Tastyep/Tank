@@ -4,8 +4,10 @@
 #include <stdexcept>
 
 #include <iostream>
-VerticesCalculator::VerticesCalculator(const sf::Sprite &sprite)
-    : previousStep(StepDirection::None), nextStep(StepDirection::None) {
+VerticesCalculator::VerticesCalculator(const sf::Sprite &sprite,
+                                       float maxFaceAngle)
+    : maxFaceAngle(maxFaceAngle), previousStep(StepDirection::None),
+      nextStep(StepDirection::None) {
   const sf::Texture *texture = sprite.getTexture();
   this->bound = sprite.getTextureRect();
 
@@ -28,10 +30,23 @@ void VerticesCalculator::computeVertices() {
   this->walkPerimeter(start.x, start.y);
   this->removeSteps();
   this->polygonize();
-  this->triangulate();
+  Polygon polygon(this->vertices);
+
+  if (polygon.isConvex()) {
+    std::cout << "isConvex"
+              << "\n";
+    this->polygons.push_back(polygon);
+    this->vertices.clear();
+  } else {
+    std::cout << "Not convex"
+              << "\n";
+    this->triangulate();
+  }
 }
 
 void VerticesCalculator::mergeTriangles(std::vector<Polygon> &polygons) {
+  // std::cout << "Enter"
+  //           << "\n";
   while (!polygons.empty()) {
     for (int i = 0; i < static_cast<int>(polygons.size()); ++i) {
       for (int v = 0; v < static_cast<int>(polygons[i].size()); ++v) {
@@ -52,6 +67,13 @@ void VerticesCalculator::mergeTriangles(std::vector<Polygon> &polygons) {
 
           bool topConvex = top.isConvex();
           bool bottomConvex = bottom.isConvex();
+          //   if (not topConvex or not bottomConvex) {
+          //     std::cout << "top/bottom: " << (int)topConvex << " "
+          //               << (int)bottomConvex << std::endl
+          //               << top << std::endl
+          //               << std::endl
+          //               << bottom << "\n";
+          //   }
 
           if (topConvex &&
               bottomConvex) { // resulting polygon will be convex too
@@ -59,6 +81,9 @@ void VerticesCalculator::mergeTriangles(std::vector<Polygon> &polygons) {
             std::vector<Position> newVertices(vertices.begin(),
                                               vertices.begin() + v + 1);
 
+            // std::cout << "Merge " << std::endl
+            //           << polygon << " " << std::endl
+            //           << *it << "\n";
             sIdx = (sIdx + 1) % it->size();
             while (sIdx != fIdx) {
               newVertices.push_back((*it)[sIdx]);
@@ -69,7 +94,8 @@ void VerticesCalculator::mergeTriangles(std::vector<Polygon> &polygons) {
               newVertices.insert(newVertices.end(), vertices.begin() + next,
                                  vertices.end());
             // Replace the polygon's vertices by newVertices
-            polygon << newVertices;
+            polygon = newVertices;
+            // std::cout << "into: " << std::endl << polygon << "\n";
             // Try again to expand the polygon
             v = -1;
             // Remove the merged polygon
@@ -85,6 +111,7 @@ void VerticesCalculator::mergeTriangles(std::vector<Polygon> &polygons) {
       polygons.erase(polygons.begin() + i);
     }
   }
+  getchar();
 }
 
 void VerticesCalculator::triangulate() {
@@ -153,7 +180,7 @@ void VerticesCalculator::polygonize() {
                       cuDirection.y * cuDirection.y);
         angle =
             std::acos(dotProduct / norme) * (180.f / VerticesCalculator::pi);
-        if (angle > VerticesCalculator::maxAngle) {
+        if (angle > this->maxFaceAngle) {
           if (inter.first == this->vertices.front())
             converted = true;
           else {
@@ -341,6 +368,92 @@ void VerticesCalculator::move(const sf::Vector2f &displacement) {
   }
 }
 
+// void CalculateInterval(Vector Axis, Polygon P, float &min, float &max) {
+//   float d = Axis dot P.getVertices.front();
+//   min = max = d;
+//
+//   for (const auto &vertex : P.getVertices()) {
+//     float d = vertex dot Axis;
+//     if (d < min)
+//       min = d;
+//     else if (d > max)
+//       max = d;
+//   }
+// }
+//
+// sf::Vector2f FindMTD(std::vector<sf::Vector2f> &pushVectors) {
+//   sf::Vector2f MTD = pushVectors.front();
+//   float mind2 = pushVectors[0] dot pushVectors[0];
+//   int pushSize = pushVectors.size();
+//
+//   for (int i = 1; i < pushSize; ++i) {
+//     float d2 = pushVectors[i] * pushVectors[i];
+//
+//     if (d2 < mind2) {
+//       mind2 = d2;
+//       MTD = pushVectors[i];
+//     }
+//   }
+//   return MTD;
+// }
+//
+// bool AxisSeparatePolygons(sf::Vector2f &Axis, Polygon A, Polygon B) {
+//   float mina, maxa;
+//   float minb, maxb;
+//
+//   CalculateInterval(Axis, A, mina, maxa);
+//   CalculateInterval(Axis, B, minb, maxb);
+//
+//   if (mina > maxb || minb > maxa)
+//     return true;
+//
+//   // find the interval overlap
+//   float d0 = maxa - minb;
+//   float d1 = maxb - mina;
+//   float depth = (d0 < d1) ? d0 : d1;
+//
+//   // convert the separation axis into a push vector (re-normalise
+//   // the axis and multiply by interval overlap)
+//   float axis_length_squared = Axis dot Axis;
+//
+//   Axis *= depth / axis_length_squared;
+//   return false;
+// }
+//
+// bool intersect(Polygon A, Polygon B, sf::Vector2f &MTD) {
+//   // potential separation axes. they get converted into push
+//   std::vector<sf::Vector2f> axis;
+//   int iNumAxis = 0;
+//
+//   for (int j = A.size() - 1, i = 0; i < A.size(); j = i, i++) {
+//     sf::Vector2f E = A.vertex[i] – A.vertex[j];
+//     sf::Vector2f N = sf::Vector2f(-A.EdgeDir[I].y, A.EdgeDir[I].x);
+//     axis.push_back(sf::Vector2f(-E.y, E.x));
+//
+//     if (AxisSeparatePolygons(axis.back(), A, B))
+//       return false;
+//   }
+//   for (j = B.size() - 1, i = 0; i < B.size(); j = i, i++) {
+//     sf::Vector2f E = B.vertex[i] – B.vertex[j];
+//     axis.push_back(sf::Vector2f(-E.y, E.x));
+//
+//     if (AxisSeparatePolygons(N, A, B))
+//       return false;
+//   }
+//
+//   // find the MTD among all the separation vectors
+//   MTD = FindMTD(Axis);
+//
+//   // makes sure the push vector is pushing A away from B
+//   sf::Vector2f D = A.getPosition() – B.getPosition(
+//
+//   );
+//   if (D dot MTD < 0.0f)
+//     MTD = -MTD;
+//
+//   return true;
+// }
+
 bool VerticesCalculator::intersects(const Polygon &polygonA,
                                     const Polygon &polygonB) const {
   const auto &verticesA = polygonA.getVertices();
@@ -400,10 +513,7 @@ void VerticesCalculator::setPosition(const Position &pos) {
   allignedPos.x -= this->bound.width / 2;
   allignedPos.y -= this->bound.height / 2;
   for (auto &polygon : this->polygons) {
-    for (auto &point : polygon.getVertices()) {
-      point.x += allignedPos.x;
-      point.y += allignedPos.y;
-    }
+    polygon.setPosition(allignedPos);
   }
 }
 

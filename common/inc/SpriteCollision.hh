@@ -7,7 +7,7 @@
 class SpriteCollision {
 public:
   SpriteCollision() = default;
-  SpriteCollision(const sf::Sprite &sprite);
+  SpriteCollision(const sf::Sprite &sprite, float maxFaceAngle);
 
   ~SpriteCollision() = default;
   SpriteCollision(const SpriteCollision &other) = default;
