@@ -385,23 +385,6 @@ void VerticesCalculator::projectPolygon(const sf::Vector2f &faceNormal,
   }
 }
 
-float VerticesCalculator::calculateIntervalDistance(float minA, float maxA,
-                                                    float minB,
-                                                    float maxB) const {
-  if (minA < minB) {
-    return minB - maxA;
-  } else {
-    return minA - maxB;
-  }
-}
-
-void VerticesCalculator::normalize(sf::Vector2f &vec) const {
-  float length = std::sqrt(vec.x * vec.x + vec.y * vec.y);
-
-  vec.x /= length;
-  vec.y /= length;
-}
-
 intersectionResult
 VerticesCalculator::intersects(const Polygon &polygonA,
                                const Polygon &polygonB) const {
@@ -425,69 +408,29 @@ VerticesCalculator::intersects(const Polygon &polygonA,
       this->projectPolygon(ax, verticesA, minA, maxA);
       this->projectPolygon(ax, verticesB, minB, maxB);
 
-      intervalDistance =
-          this->calculateIntervalDistance(minA, maxA, minB, maxB);
-      if (intervalDistance > 0) {
+      if (minA > maxB || minB > maxA) { // Doesn't Overlaps
         result.intersects = false;
         return result;
-      }
-      std::cout << ax.x << " " << ax.y << " " << intervalDistance << " "
-                << minIntervalDistance << "\n";
-      if (intervalDistance < minIntervalDistance) {
-        minIntervalDistance = intervalDistance;
-        result.faceNormal = ax;
-        result.distance = intervalDistance;
+      } else {
+        intervalDistance = std::min(maxA, maxB) - std::max(minA, minB);
+        std::cout << ax.x << " " << ax.y << " " << intervalDistance << " "
+                  << minIntervalDistance << "\n";
+        if (intervalDistance < minIntervalDistance) {
+          minIntervalDistance = intervalDistance;
+          result.faceNormal = ax;
+          result.distance = intervalDistance;
+        }
       }
     }
   }
   return result;
 }
-//
-// bool VerticesCalculator::intersects(const Polygon &polygonA,
-//                                     const Polygon &polygonB) const {
-//   const auto &verticesA = polygonA.getVertices();
-//   const auto &verticesB = polygonB.getVertices();
-//
-//   for (int id = 0; id < 2; ++id) {
-//     const auto &vertices = (id == 0 ? verticesA : verticesB);
-//
-//     for (unsigned int i = 0; i < vertices.size(); ++i) {
-//       int j = (i + 1) % vertices.size();
-//       sf::Vector2f normal(vertices[j].y - vertices[i].y,
-//                           vertices[i].x - vertices[j].x);
-//       double minA = std::numeric_limits<double>::max();
-//       double minB = std::numeric_limits<double>::max();
-//       double maxA = std::numeric_limits<double>::min();
-//       double maxB = std::numeric_limits<double>::min();
-//
-//       for (const auto &edge : verticesA) {
-//         double projected = normal.x * edge.x + normal.y * edge.y;
-//
-//         if (projected < minA)
-//           minA = projected;
-//         if (projected > maxA)
-//           maxA = projected;
-//       }
-//       for (const auto &edge : verticesB) {
-//         double projected = normal.x * edge.x + normal.y * edge.y;
-//
-//         if (projected < minB)
-//           minB = projected;
-//         if (projected > maxB)
-//           maxB = projected;
-//       }
-//       if (maxA < minB || maxB < minA)
-//         return false;
-//     }
-//   }
-//   return true;
-// }
 
 intersectionResult
 VerticesCalculator::intersects(const std::vector<Polygon> &polygons) const {
   bool intersects = false;
   intersectionResult inter;
-  intersectionResult save;
+  intersectionResult save(false);
 
   std::cout << "TEST INTERSECTION"
             << "\n";
@@ -501,9 +444,7 @@ VerticesCalculator::intersects(const std::vector<Polygon> &polygons) const {
       }
     }
   }
-  // if (intersects) {
-  //   std::cout << save.A << " " << save.B << "\n";
-  // }
+
   return save;
 }
 

@@ -77,8 +77,6 @@ private:
   void projectPolygon(const sf::Vector2f &faceNormal,
                       const std::vector<Position> &vertices, float &min,
                       float &max) const;
-  float calculateIntervalDistance(float minA, float maxA, float minB,
-                                  float maxB) const;
   intersectionResult intersects(const Polygon &polygonA,
                                 const Polygon &polygonB) const;
 
