@@ -55,12 +55,11 @@ void SpriteCollision::move(const sf::Vector2f &displacement) {
 
 const Rectangle &SpriteCollision::getBound() const { return this->spriteBound; }
 
-bool SpriteCollision::intersects(const SpriteCollision &spriteCollision) const {
+intersectionResult
+SpriteCollision::intersects(const SpriteCollision &spriteCollision) const {
   if (this->spriteBound.intersects(spriteCollision.getBound())) {
-    if (this->verticesCalculator.intersects(
-            spriteCollision.getVerticesCalculator().getPolygons())) {
-      return true;
-    }
+    return this->verticesCalculator.intersects(
+        spriteCollision.getVerticesCalculator().getPolygons());
   }
-  return false;
+  return intersectionResult(false);
 }

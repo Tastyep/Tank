@@ -26,11 +26,11 @@ public:
   Entity &operator=(Entity &&other) = default;
 
   virtual void draw(sf::RenderTarget &renderTarget) const = 0;
-  virtual void getImpacted(Entity &entity) = 0;
-  virtual void getImpacted(Ball &ball);
-  virtual void getImpacted(Player &player);
+  virtual void getImpacted(Entity &entity, const intersectionResult &inter) = 0;
+  virtual void getImpacted(Ball &ball, const intersectionResult &inter);
+  virtual void getImpacted(Player &player, const intersectionResult &inter);
 
-  virtual bool intersects(std::shared_ptr<Entity> ent) const;
+  virtual intersectionResult intersects(std::shared_ptr<Entity> ent) const;
   const Position &getPosition() const;
   const sf::Sprite &getSprite() const;
   void setPosition(Position pos);

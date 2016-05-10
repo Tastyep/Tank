@@ -19,7 +19,7 @@ public:
   void move(const sf::Vector2f &displacement);
   void rotate(double angle);
   const Rectangle &getBound() const;
-  bool intersects(const SpriteCollision &spriteCollision) const;
+  intersectionResult intersects(const SpriteCollision &spriteCollision) const;
   const VerticesCalculator &getVerticesCalculator() const {
     return this->verticesCalculator;
   };

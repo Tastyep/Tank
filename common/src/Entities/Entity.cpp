@@ -35,7 +35,7 @@ void Entity::applyRotation(double angle) {
   this->spriteBound.rotate(-angle);
 }
 
-bool Entity::intersects(std::shared_ptr<Entity> ent) const {
+intersectionResult Entity::intersects(std::shared_ptr<Entity> ent) const {
   return this->spriteBound.intersects(ent->getSpriteCollisionObject());
 }
 
@@ -51,9 +51,9 @@ bool Entity::isAlive() const { return this->alive; }
 
 void Entity::setDead() { this->alive = false; }
 
-void Entity::getImpacted(Ball &ball) {
-  this->getImpacted(static_cast<Entity &>(ball));
+void Entity::getImpacted(Ball &ball, const intersectionResult &inter) {
+  this->getImpacted(static_cast<Entity &>(ball), inter);
 }
-void Entity::getImpacted(Player &player) {
-  this->getImpacted(static_cast<Entity &>(player));
+void Entity::getImpacted(Player &player, const intersectionResult &inter) {
+  this->getImpacted(static_cast<Entity &>(player), inter);
 }

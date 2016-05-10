@@ -13,10 +13,10 @@ public:
   Wall &operator=(const Wall &other) = default;
   Wall &operator=(Wall &&other) = default;
 
-  bool intersects(const Entity &ent) const;
-  void getImpacted(Entity &entity);
-  void getImpacted(Ball &entity);
-  void getImpacted(Player &player);
+  intersectionResult intersects(const Entity &ent) const;
+  void getImpacted(Entity &entity, const intersectionResult &inter);
+  void getImpacted(Ball &entity, const intersectionResult &inter);
+  void getImpacted(Player &player, const intersectionResult &inter);
   void draw(sf::RenderTarget &renderTarget) const;
 };
 

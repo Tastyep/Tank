@@ -12,6 +12,7 @@ bool Grid::checkCollision(Movable &entity) {
   const Rectangle &rect = spriteBound.getBound();
   const auto &edges = rect.getEdges();
   std::array<Position, 4> cellPositions;
+  intersectionResult inter;
   unsigned int includedCells = 0;
 
   for (Position edge : edges) {
@@ -31,16 +32,18 @@ bool Grid::checkCollision(Movable &entity) {
     for (auto &ent : entities) {
       if (&entity == ent.get() || !ent->isAlive())
         continue;
-      if (entity.intersects(ent)) {
-        entity.impact(ent);
+      inter = entity.intersects(ent);
+      if (inter.intersects) {
+        entity.impact(ent, inter);
         return true;
       }
     }
     for (auto &ent : updatableEntities) {
       if (&entity == ent.get() || !ent->isAlive())
         continue;
-      if (entity.intersects(ent)) {
-        entity.impact(ent);
+      inter = entity.intersects(ent);
+      if (inter.intersects) {
+        entity.impact(ent, inter);
         return true;
       }
     }

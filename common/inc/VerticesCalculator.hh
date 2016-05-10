@@ -7,6 +7,14 @@
 #include <array>
 #include <vector>
 
+struct intersectionResult {
+  bool intersects;
+  sf::Vector2f faceNormal;
+  float distance;
+
+  intersectionResult(bool intersects = true) : intersects(intersects) {}
+};
+
 class VerticesCalculator {
 private:
   enum StepDirection { None, N, W, S, E };
@@ -49,7 +57,7 @@ public:
   void move(const sf::Vector2f &displacement);
   void setPosition(const Position &pos);
   void rotate(double angle);
-  bool intersects(const std::vector<Polygon> &polygons) const;
+  intersectionResult intersects(const std::vector<Polygon> &polygons) const;
   const std::vector<Polygon> &getPolygons() const;
 
 private:
@@ -63,8 +71,16 @@ private:
   void polygonize();
   void triangulate();
   void mergeTriangles(std::vector<Polygon> &polygons);
-  bool intersects(const Polygon &polygonA, const Polygon &polygonB) const;
   void allignOnSprite(int x, int y);
+  float dot(const sf::Vector2f &a, const sf::Vector2f &b) const;
+  void normalize(sf::Vector2f &vec) const;
+  void projectPolygon(const sf::Vector2f &faceNormal,
+                      const std::vector<Position> &vertices, float &min,
+                      float &max) const;
+  float calculateIntervalDistance(float minA, float maxA, float minB,
+                                  float maxB) const;
+  intersectionResult intersects(const Polygon &polygonA,
+                                const Polygon &polygonB) const;
 
 private:
   float maxFaceAngle;

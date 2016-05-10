@@ -58,9 +58,12 @@ void Player::update(Grid &grid, std::chrono::nanoseconds time) {
   }
 }
 
-void Player::impact(std::shared_ptr<Entity> entity) {
-  entity->getImpacted(*this);
+void Player::impact(std::shared_ptr<Entity> entity,
+                    const intersectionResult &inter) {
+  entity->getImpacted(*this, inter);
 }
 
-void Player::getImpacted(Entity &entity) {}
-void Player::getImpacted(Ball &ball) { this->alive = false; }
+void Player::getImpacted(Entity &entity, const intersectionResult &inter) {}
+void Player::getImpacted(Ball &ball, const intersectionResult &inter) {
+  this->alive = false;
+}

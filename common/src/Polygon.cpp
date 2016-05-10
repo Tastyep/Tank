@@ -4,19 +4,25 @@
 
 Polygon::Polygon(const std::vector<Position> &vertices)
     : vertices(vertices), originVertices(vertices) {
+  this->axis.resize(this->vertices.size());
   this->computeTranslation();
+  this->computeAxis();
 }
 
 Polygon::Polygon(const Polygon &other) {
   this->vertices = other.vertices;
   this->originVertices = other.originVertices;
   this->translation = other.translation;
+  this->axis = other.axis;
 };
 
 void Polygon::operator=(const std::vector<Position> &vertices) {
   this->vertices = vertices;
   this->originVertices = vertices;
+  this->axis.clear();
+  this->axis.resize(this->vertices.size());
   this->computeTranslation();
+  this->computeAxis();
 };
 
 Position &Polygon::operator[](int idx) {
@@ -77,7 +83,6 @@ const std::vector<Position> &Polygon::getOriginVertices() const {
 const std::vector<Position> &Polygon::getVertices() const {
   return this->vertices;
 }
-std::vector<Position> &Polygon::getVertices() { return this->vertices; }
 
 unsigned int Polygon::size() const { return this->vertices.size(); }
 
@@ -87,6 +92,24 @@ void Polygon::setPosition(const Position &position) {
   for (unsigned int i = 0; i < size; ++i) {
     vertices[i].x = originVertices[i].x + position.x;
     vertices[i].y = originVertices[i].y + position.y;
+  }
+}
+
+void Polygon::move(const sf::Vector2f &displacement) {
+  for (auto &point : this->vertices)
+    point += displacement;
+}
+
+void Polygon::rotate(double cs, double sn, const Position &rotationCenter) {
+  Position translatedPos;
+
+  for (auto &point : this->vertices) {
+    translatedPos.x = point.x - rotationCenter.x;
+    translatedPos.y = point.y - rotationCenter.y;
+    point.x = translatedPos.x * cs - translatedPos.y * sn;
+    point.y = translatedPos.x * sn + translatedPos.y * cs;
+    point.x += rotationCenter.x;
+    point.y += rotationCenter.y;
   }
 }
 
@@ -102,6 +125,26 @@ void Polygon::computeTranslation() {
   }
   this->translation = sf::Vector2f(minX, minY);
 }
+
+void Polygon::computeAxis() {
+  unsigned int i = 0;
+  float length;
+
+  for (unsigned int j = this->vertices.size() - 1; i < this->vertices.size();
+       j = i, ++i) {
+    auto &ax = this->axis[i];
+
+    // Compute the normal from the two vertices
+    ax = {-(vertices[i].y - vertices[j].y), vertices[i].x - vertices[j].x};
+
+    // then norme it
+    length = std::sqrt(ax.x * ax.x + ax.y * ax.y);
+    ax.x /= length;
+    ax.y /= length;
+  }
+}
+
+const std::vector<sf::Vector2f> &Polygon::getAxis() const { return this->axis; }
 
 Position Polygon::getPosition() const {
   return this->position + this->translation;

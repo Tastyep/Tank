@@ -26,10 +26,11 @@ void Ball::update(Grid &grid, std::chrono::nanoseconds time) {
   this->displace(1, time, grid);
 }
 
-void Ball::getImpacted(Entity &entity) {}
+void Ball::getImpacted(Entity &entity, const intersectionResult &inter) {}
 
-void Ball::impact(std::shared_ptr<Entity> entity) {
-  entity->getImpacted(*this);
+void Ball::impact(std::shared_ptr<Entity> entity,
+                  const intersectionResult &inter) {
+  entity->getImpacted(*this, inter);
 }
 
 void Ball::bounce() {
@@ -38,6 +39,16 @@ void Ball::bounce() {
     this->alive = false;
 }
 
-void Ball::computeReflectedDirection(const Wall &wall) {
-  const auto &wallBound = wall.getSpriteCollisionObject().getBound().getEdges();
+void Ball::computeReflectedDirection(const Wall &wall,
+                                     const intersectionResult &inter) {
+  // V’ = V – (2 * (V . N)) * N
+  sf::Vector2f scaledNormal = inter.faceNormal;
+  float dot = this->direction.x * inter.faceNormal.x +
+              this->direction.y * inter.faceNormal.y;
+
+  scaledNormal.x *= (2.f * dot);
+  scaledNormal.y *= (2.f * dot);
+  this->direction -= scaledNormal;
+  std::cout << "normal: " << inter.faceNormal.x << " " << inter.faceNormal.y
+            << "\n";
 }

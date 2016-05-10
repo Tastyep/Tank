@@ -21,9 +21,9 @@ public:
   Player &operator=(Player &&other) = default;
 
   void update(Grid &grid, std::chrono::nanoseconds);
-  void getImpacted(Entity &entity);
-  void getImpacted(Ball &entity);
-  void impact(std::shared_ptr<Entity> entity);
+  void getImpacted(Entity &entity, const intersectionResult &inter);
+  void getImpacted(Ball &entity, const intersectionResult &inter);
+  void impact(std::shared_ptr<Entity> entity, const intersectionResult &inter);
 
 private:
   void spawnBall(Grid &grid);

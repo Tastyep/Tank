@@ -111,7 +111,6 @@ void VerticesCalculator::mergeTriangles(std::vector<Polygon> &polygons) {
       polygons.erase(polygons.begin() + i);
     }
   }
-  getchar();
 }
 
 void VerticesCalculator::triangulate() {
@@ -245,7 +244,6 @@ void VerticesCalculator::removeSteps() {
 
 sf::Vector2i VerticesCalculator::findStartPoint() {
   sf::Vector2i pos;
-  int state;
 
   for (pos.y = 0; pos.y < this->bound.height - 1; ++pos.y) {
     for (pos.x = 0; pos.x < this->bound.width - 1; ++pos.x) {
@@ -362,148 +360,151 @@ void VerticesCalculator::move(const sf::Vector2f &displacement) {
   this->position.x += displacement.x;
   this->position.y += displacement.y;
   for (auto &polygon : this->polygons) {
-    for (auto &point : polygon.getVertices()) {
-      point += displacement;
-    }
+    polygon.move(displacement);
   }
 }
 
-// void CalculateInterval(Vector Axis, Polygon P, float &min, float &max) {
-//   float d = Axis dot P.getVertices.front();
-//   min = max = d;
+float VerticesCalculator::dot(const sf::Vector2f &a,
+                              const sf::Vector2f &b) const {
+  return a.x * b.x + a.y * b.y;
+}
+
+void VerticesCalculator::projectPolygon(const sf::Vector2f &faceNormal,
+                                        const std::vector<Position> &vertices,
+                                        float &min, float &max) const {
+  float dotProduct;
+
+  for (const auto &edge : vertices) {
+    // To project a point on an axis use the dot product
+    dotProduct = faceNormal.x * edge.x + faceNormal.y * edge.y;
+
+    if (dotProduct < min)
+      min = dotProduct;
+    if (dotProduct > max)
+      max = dotProduct;
+  }
+}
+
+float VerticesCalculator::calculateIntervalDistance(float minA, float maxA,
+                                                    float minB,
+                                                    float maxB) const {
+  if (minA < minB) {
+    return minB - maxA;
+  } else {
+    return minA - maxB;
+  }
+}
+
+void VerticesCalculator::normalize(sf::Vector2f &vec) const {
+  float length = std::sqrt(vec.x * vec.x + vec.y * vec.y);
+
+  vec.x /= length;
+  vec.y /= length;
+}
+
+intersectionResult
+VerticesCalculator::intersects(const Polygon &polygonA,
+                               const Polygon &polygonB) const {
+  intersectionResult result;
+  float intervalDistance;
+  float minIntervalDistance = std::numeric_limits<float>::max();
+  const auto &verticesA = polygonA.getVertices();
+  const auto &verticesB = polygonB.getVertices();
+  const auto &axisA = polygonA.getAxis();
+  const auto &axisB = polygonB.getAxis();
+
+  for (int pId = 0; pId < 2; ++pId) {
+    const auto &axis = (pId == 0 ? axisA : axisB);
+
+    for (const auto &ax : axis) {
+      float minA = std::numeric_limits<double>::max();
+      float minB = std::numeric_limits<double>::max();
+      float maxA = std::numeric_limits<double>::min();
+      float maxB = std::numeric_limits<double>::min();
+
+      this->projectPolygon(ax, verticesA, minA, maxA);
+      this->projectPolygon(ax, verticesB, minB, maxB);
+
+      intervalDistance =
+          this->calculateIntervalDistance(minA, maxA, minB, maxB);
+      if (intervalDistance > 0) {
+        result.intersects = false;
+        return result;
+      }
+      std::cout << ax.x << " " << ax.y << " " << intervalDistance << " "
+                << minIntervalDistance << "\n";
+      if (intervalDistance < minIntervalDistance) {
+        minIntervalDistance = intervalDistance;
+        result.faceNormal = ax;
+        result.distance = intervalDistance;
+      }
+    }
+  }
+  return result;
+}
 //
-//   for (const auto &vertex : P.getVertices()) {
-//     float d = vertex dot Axis;
-//     if (d < min)
-//       min = d;
-//     else if (d > max)
-//       max = d;
-//   }
-// }
+// bool VerticesCalculator::intersects(const Polygon &polygonA,
+//                                     const Polygon &polygonB) const {
+//   const auto &verticesA = polygonA.getVertices();
+//   const auto &verticesB = polygonB.getVertices();
 //
-// sf::Vector2f FindMTD(std::vector<sf::Vector2f> &pushVectors) {
-//   sf::Vector2f MTD = pushVectors.front();
-//   float mind2 = pushVectors[0] dot pushVectors[0];
-//   int pushSize = pushVectors.size();
+//   for (int id = 0; id < 2; ++id) {
+//     const auto &vertices = (id == 0 ? verticesA : verticesB);
 //
-//   for (int i = 1; i < pushSize; ++i) {
-//     float d2 = pushVectors[i] * pushVectors[i];
+//     for (unsigned int i = 0; i < vertices.size(); ++i) {
+//       int j = (i + 1) % vertices.size();
+//       sf::Vector2f normal(vertices[j].y - vertices[i].y,
+//                           vertices[i].x - vertices[j].x);
+//       double minA = std::numeric_limits<double>::max();
+//       double minB = std::numeric_limits<double>::max();
+//       double maxA = std::numeric_limits<double>::min();
+//       double maxB = std::numeric_limits<double>::min();
 //
-//     if (d2 < mind2) {
-//       mind2 = d2;
-//       MTD = pushVectors[i];
+//       for (const auto &edge : verticesA) {
+//         double projected = normal.x * edge.x + normal.y * edge.y;
+//
+//         if (projected < minA)
+//           minA = projected;
+//         if (projected > maxA)
+//           maxA = projected;
+//       }
+//       for (const auto &edge : verticesB) {
+//         double projected = normal.x * edge.x + normal.y * edge.y;
+//
+//         if (projected < minB)
+//           minB = projected;
+//         if (projected > maxB)
+//           maxB = projected;
+//       }
+//       if (maxA < minB || maxB < minA)
+//         return false;
 //     }
 //   }
-//   return MTD;
-// }
-//
-// bool AxisSeparatePolygons(sf::Vector2f &Axis, Polygon A, Polygon B) {
-//   float mina, maxa;
-//   float minb, maxb;
-//
-//   CalculateInterval(Axis, A, mina, maxa);
-//   CalculateInterval(Axis, B, minb, maxb);
-//
-//   if (mina > maxb || minb > maxa)
-//     return true;
-//
-//   // find the interval overlap
-//   float d0 = maxa - minb;
-//   float d1 = maxb - mina;
-//   float depth = (d0 < d1) ? d0 : d1;
-//
-//   // convert the separation axis into a push vector (re-normalise
-//   // the axis and multiply by interval overlap)
-//   float axis_length_squared = Axis dot Axis;
-//
-//   Axis *= depth / axis_length_squared;
-//   return false;
-// }
-//
-// bool intersect(Polygon A, Polygon B, sf::Vector2f &MTD) {
-//   // potential separation axes. they get converted into push
-//   std::vector<sf::Vector2f> axis;
-//   int iNumAxis = 0;
-//
-//   for (int j = A.size() - 1, i = 0; i < A.size(); j = i, i++) {
-//     sf::Vector2f E = A.vertex[i] – A.vertex[j];
-//     sf::Vector2f N = sf::Vector2f(-A.EdgeDir[I].y, A.EdgeDir[I].x);
-//     axis.push_back(sf::Vector2f(-E.y, E.x));
-//
-//     if (AxisSeparatePolygons(axis.back(), A, B))
-//       return false;
-//   }
-//   for (j = B.size() - 1, i = 0; i < B.size(); j = i, i++) {
-//     sf::Vector2f E = B.vertex[i] – B.vertex[j];
-//     axis.push_back(sf::Vector2f(-E.y, E.x));
-//
-//     if (AxisSeparatePolygons(N, A, B))
-//       return false;
-//   }
-//
-//   // find the MTD among all the separation vectors
-//   MTD = FindMTD(Axis);
-//
-//   // makes sure the push vector is pushing A away from B
-//   sf::Vector2f D = A.getPosition() – B.getPosition(
-//
-//   );
-//   if (D dot MTD < 0.0f)
-//     MTD = -MTD;
-//
 //   return true;
 // }
 
-bool VerticesCalculator::intersects(const Polygon &polygonA,
-                                    const Polygon &polygonB) const {
-  const auto &verticesA = polygonA.getVertices();
-  const auto &verticesB = polygonB.getVertices();
+intersectionResult
+VerticesCalculator::intersects(const std::vector<Polygon> &polygons) const {
+  bool intersects = false;
+  intersectionResult inter;
+  intersectionResult save;
 
-  for (int id = 0; id < 2; ++id) {
-    const auto &vertices = (id == 0 ? verticesA : verticesB);
-
-    for (unsigned int i = 0; i < vertices.size(); ++i) {
-      int j = (i + 1) % vertices.size();
-      sf::Vector2f normal(vertices[j].y - vertices[i].y,
-                          vertices[i].x - vertices[j].x);
-      double minA = std::numeric_limits<double>::max();
-      double minB = std::numeric_limits<double>::max();
-      double maxA = std::numeric_limits<double>::min();
-      double maxB = std::numeric_limits<double>::min();
-
-      for (const auto &edge : verticesA) {
-        double projected = normal.x * edge.x + normal.y * edge.y;
-
-        if (projected < minA)
-          minA = projected;
-        if (projected > maxA)
-          maxA = projected;
-      }
-      for (const auto &edge : verticesB) {
-        double projected = normal.x * edge.x + normal.y * edge.y;
-
-        if (projected < minB)
-          minB = projected;
-        if (projected > maxB)
-          maxB = projected;
-      }
-      if (maxA < minB || maxB < minA)
-        return false;
-    }
-  }
-  return true;
-}
-
-bool VerticesCalculator::intersects(
-    const std::vector<Polygon> &polygons) const {
-
+  std::cout << "TEST INTERSECTION"
+            << "\n";
   for (const Polygon &polygonA : this->polygons) {
     for (const Polygon &polygonB : polygons) {
-      if (this->intersects(polygonA, polygonB))
-        return true;
+      inter = this->intersects(polygonA, polygonB);
+
+      if (inter.intersects && intersects == false) {
+        intersects = true;
+        save = inter;
+      }
     }
   }
-  return false;
+  // if (intersects) {
+  //   std::cout << save.A << " " << save.B << "\n";
+  // }
+  return save;
 }
 
 void VerticesCalculator::setPosition(const Position &pos) {
@@ -518,20 +519,12 @@ void VerticesCalculator::setPosition(const Position &pos) {
 }
 
 void VerticesCalculator::rotate(double angle) {
-  Position copy;
   angle *= (VerticesCalculator::pi / 180.f);
   double cs = std::cos(angle);
   double sn = std::sin(angle);
 
   for (auto &polygon : this->polygons) {
-    for (auto &point : polygon.getVertices()) {
-      copy.x = point.x - this->position.x;
-      copy.y = point.y - this->position.y;
-      point.x = copy.x * cs - copy.y * sn;
-      point.y = copy.x * sn + copy.y * cs;
-      point.x += this->position.x;
-      point.y += this->position.y;
-    }
+    polygon.rotate(cs, sn, this->position);
   }
 }
 

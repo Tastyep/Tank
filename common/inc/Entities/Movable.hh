@@ -16,7 +16,8 @@ public:
   Movable &operator=(Movable &&other) = default;
 
   virtual void update(Grid &grid, std::chrono::nanoseconds time) = 0;
-  virtual void impact(std::shared_ptr<Entity> entity) = 0;
+  virtual void impact(std::shared_ptr<Entity> entity,
+                      const intersectionResult &inter) = 0;
   void draw(sf::RenderTarget &renderTarget) const;
   void setDirection(const sf::Vector2f direction);
 

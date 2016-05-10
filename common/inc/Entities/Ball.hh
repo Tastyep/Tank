@@ -16,10 +16,11 @@ public:
   Ball &operator=(Ball &&other) = default;
 
   void update(Grid &grid, std::chrono::nanoseconds time);
-  void getImpacted(Entity &entity);
-  void impact(std::shared_ptr<Entity> entity);
+  void getImpacted(Entity &entity, const intersectionResult &inter);
+  void impact(std::shared_ptr<Entity> entity, const intersectionResult &inter);
   void bounce();
-  void computeReflectedDirection(const Wall &wall);
+  void computeReflectedDirection(const Wall &wall,
+                                 const intersectionResult &inter);
 
 private:
   virtual void displace(int side, std::chrono::nanoseconds time, Grid &grid);

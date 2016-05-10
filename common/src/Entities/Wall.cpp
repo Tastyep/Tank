@@ -4,8 +4,8 @@
 
 Wall::Wall(const sf::Sprite &sprite) : Entity(sprite) {}
 
-bool Wall::intersects(const Entity &ent) const {
-  return false; // not done yet
+intersectionResult Wall::intersects(const Entity &ent) const {
+  return intersectionResult(false); // not done yet
 }
 void Wall::draw(sf::RenderTarget &renderTarget) const {
   renderTarget.draw(this->sprite);
@@ -35,9 +35,9 @@ void Wall::draw(sf::RenderTarget &renderTarget) const {
   // renderTarget.draw(convex);
 }
 
-void Wall::getImpacted(Entity &entity) {}
-void Wall::getImpacted(Player &player) {}
-void Wall::getImpacted(Ball &ball) {
+void Wall::getImpacted(Entity &entity, const intersectionResult &inter) {}
+void Wall::getImpacted(Player &player, const intersectionResult &inter) {}
+void Wall::getImpacted(Ball &ball, const intersectionResult &inter) {
   ball.bounce();
-  ball.computeReflectedDirection(*this);
+  ball.computeReflectedDirection(*this, inter);
 }
