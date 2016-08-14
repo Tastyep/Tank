@@ -9,7 +9,7 @@ project (${NAME} CXX)
 
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/Modules)
 
-find_package(SFML 2.3 REQUIRED system window graphics audio)
+find_package(SFML 2.1 REQUIRED system window graphics audio)
 find_package(Protobuf)
 find_package(ENet)
 
@@ -44,4 +44,4 @@ add_executable(${NAME} ${sources})
 target_link_libraries (${NAME} ${SFML_LIBRARIES})
 set_target_properties(${NAME}
     PROPERTIES
-   LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/")                                                     
+   LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/")

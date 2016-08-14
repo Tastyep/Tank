@@ -5,6 +5,7 @@
 #include "Triangulation.hh"
 #include <SFML/Graphics.hpp>
 #include <array>
+#include <cmath>
 #include <vector>
 
 struct intersectionResult {
