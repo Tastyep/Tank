@@ -13,6 +13,7 @@ void EntityBody::move(const sf::Vector2f &displacement) {
   for (auto &polygon : this->polygons) {
     polygon.move(displacement);
   }
+  this->spriteBound.move(displacement);
 }
 
 void EntityBody::setPosition(const Position &pos) {
@@ -24,6 +25,7 @@ void EntityBody::setPosition(const Position &pos) {
   for (auto &polygon : this->polygons) {
     polygon.setPosition(allignedPos);
   }
+  this->spriteBound.setPosition(pos);
 }
 
 void EntityBody::rotate(double angle) {
@@ -34,6 +36,7 @@ void EntityBody::rotate(double angle) {
   for (auto &polygon : this->polygons) {
     polygon.rotate(cs, sn, this->position);
   }
+  this->spriteBound.rotate(angle);
 }
 
 const Rectangle &EntityBody::getBound() const { return this->spriteBound; }

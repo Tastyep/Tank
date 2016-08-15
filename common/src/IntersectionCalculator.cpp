@@ -50,8 +50,8 @@ IntersectionCalculator::intersects(const Polygon &polygonA,
         return result;
       } else {
         intervalDistance = std::min(maxA, maxB) - std::max(minA, minB);
-        std::cout << ax.x << " " << ax.y << " " << intervalDistance << " "
-                  << minIntervalDistance << "\n";
+        // std::cout << ax.x << " " << ax.y << " " << intervalDistance << " "
+        //           << minIntervalDistance << "\n";
         if (intervalDistance < minIntervalDistance) {
           minIntervalDistance = intervalDistance;
           result.faceNormal = ax;
@@ -70,8 +70,8 @@ intersectionResult IntersectionCalculator::intersects(
   intersectionResult inter;
   intersectionResult save(false);
 
-  std::cout << "TEST INTERSECTION"
-            << "\n";
+  // std::cout << "TEST INTERSECTION"
+  //           << "\n";
   for (const Polygon &polygonA : polygonsA) {
     for (const Polygon &polygonB : polygonsB) {
       inter = this->intersects(polygonA, polygonB);
