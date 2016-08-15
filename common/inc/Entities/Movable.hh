@@ -7,7 +7,8 @@
 
 class Movable : public Entity, public Updatable {
 public:
-  Movable(const sf::Sprite &sprite, double maxVelocity = 2);
+  Movable(const EntityBody &body, const sf::Sprite &sprite,
+          double maxVelocity = 2);
 
   ~Movable() = default;
   Movable(const Movable &other) = default;

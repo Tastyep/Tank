@@ -4,7 +4,7 @@
 #include <iostream>
 
 TileManager::TileManager(ACvar &cvarList, unsigned int tileSize)
-    : tileSize(tileSize) {
+    : verticesCalculator(10), tileSize(tileSize) {
   auto &tm = TextureManager<>::instance();
   unsigned int tileId = 0;
   unsigned int nbTile = static_cast<unsigned int>(
@@ -23,7 +23,10 @@ TileManager::TileManager(ACvar &cvarList, unsigned int tileSize)
       sf::Sprite sprite(*gameTexture,
                         sf::IntRect(x, y, this->tileSize, this->tileSize));
       this->gameTiles.push_back(sprite);
-      this->spriteCollisions.emplace_back(sprite, maxFaceAngle);
+      this->verticesCalculator.computeVertices(sprite);
+      this->entityBodies.emplace_back(this->verticesCalculator.getPolygons(),
+                                      this->verticesCalculator.getSpriteBound(),
+                                      sprite.getTextureRect());
       ++tileId;
     }
   }
@@ -35,7 +38,6 @@ const sf::Sprite &TileManager::getTile(EntityId id) const {
   return this->gameTiles[static_cast<int>(id)];
 }
 
-const SpriteCollision &
-TileManager::getSpriteCollisionObject(EntityId id) const {
-  return this->spriteCollisions[static_cast<int>(id)];
+const EntityBody &TileManager::getEntityBody(EntityId id) const {
+  return this->entityBodies[static_cast<int>(id)];
 }

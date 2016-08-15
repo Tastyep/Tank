@@ -2,14 +2,15 @@
 #include "Entities/Ball.hh"
 #include "Entities/Player.hh"
 
-Wall::Wall(const sf::Sprite &sprite) : Entity(sprite) {}
+Wall::Wall(const EntityBody &body, const sf::Sprite &sprite)
+    : Entity(body, sprite) {}
 
 intersectionResult Wall::intersects(const Entity &ent) const {
   return intersectionResult(false); // not done yet
 }
 void Wall::draw(sf::RenderTarget &renderTarget) const {
   renderTarget.draw(this->sprite);
-  const auto &polygons = spriteBound.getVerticesCalculator().getPolygons();
+  const auto &polygons = this->body.getPolygons();
   sf::VertexArray varray(sf::LinesStrip);
 
   for (auto &polygon : polygons) {

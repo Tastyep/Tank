@@ -4,19 +4,18 @@
 #include "Grid.hh"
 #include <iostream>
 
-Player::Player(const sf::Sprite &sprite, IActionAnalyzer &actionAnalyzer,
-               const SpriteCollision &ballSpriteBound,
+Player::Player(const EntityBody &body, const sf::Sprite &sprite,
+               IActionAnalyzer &actionAnalyzer, const EntityBody &ballBody,
                const sf::Sprite &ballSprite)
-    : Movable(sprite), actionAnalyzer(actionAnalyzer),
-      ballSpriteBound(ballSpriteBound), ballSprite(ballSprite) {}
+    : Movable(body, sprite), actionAnalyzer(actionAnalyzer), ballBody(ballBody),
+      ballSprite(ballSprite) {}
 
 void Player::spawnBall(Grid &grid) {
-  std::shared_ptr<Movable> ball(new Ball(this->ballSprite));
-  ball->setSpriteCollisionObject(this->ballSpriteBound);
+  std::shared_ptr<Movable> ball(new Ball(this->ballBody, this->ballSprite));
 
   Position ballPos = this->position;
   Position gridPos;
-  const auto &ballBound = ball->getSpriteCollisionObject().getBound();
+  const auto &ballBound = this->ballBody.getBound();
   const auto &spriteBound = this->sprite.getLocalBounds();
 
   ballPos.x +=

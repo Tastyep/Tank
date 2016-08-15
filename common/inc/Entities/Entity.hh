@@ -1,9 +1,10 @@
 #ifndef TANK_ENTITY_HPP
 #define TANK_ENTITY_HPP
 
+#include "EntityBody.hh"
 #include "EntityId.hpp"
+#include "IntersectionResult.hh"
 #include "Position.hpp"
-#include "SpriteCollision.hh"
 #include "TileManager.hh"
 #include <SFML/Graphics.hpp>
 #include <memory>
@@ -17,7 +18,7 @@ public:
   static constexpr double radianConvert = (pi / 180.0);
 
 public:
-  Entity(const sf::Sprite &sprite);
+  Entity(const EntityBody &body, const sf::Sprite &sprite);
 
   ~Entity() = default;
   Entity(const Entity &other) = default;
@@ -30,22 +31,21 @@ public:
   virtual void getImpacted(Ball &ball, const intersectionResult &inter);
   virtual void getImpacted(Player &player, const intersectionResult &inter);
 
-  virtual intersectionResult intersects(std::shared_ptr<Entity> ent) const;
   const Position &getPosition() const;
   const sf::Sprite &getSprite() const;
   void setPosition(Position pos);
   void move(const sf::Vector2f &displacement);
   void applyRotation(double angle);
-  void setSpriteCollisionObject(const SpriteCollision &spriteBound);
-  const SpriteCollision &getSpriteCollisionObject() const;
+  void setBody(const EntityBody &body);
+  const EntityBody &getBody() const;
   bool isAlive() const;
   void setDead();
 
 protected:
+  EntityBody body;
   Position position;
-  sf::Sprite sprite;
-  SpriteCollision spriteBound;
   double angle;
+  sf::Sprite sprite;
   bool alive;
 };
 

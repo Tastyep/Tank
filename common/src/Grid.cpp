@@ -8,8 +8,7 @@ Grid::Grid(int width, int height) : width(width), height(height) {
 }
 
 bool Grid::checkCollision(Movable &entity) {
-  SpriteCollision spriteBound = entity.getSpriteCollisionObject();
-  const Rectangle &rect = spriteBound.getBound();
+  const Rectangle &rect = entity.getBody().getBound();
   const auto &edges = rect.getEdges();
   std::array<Position, 4> cellPositions;
   intersectionResult inter;
@@ -30,9 +29,14 @@ bool Grid::checkCollision(Movable &entity) {
     auto &updatableEntities = cell.getMovableObjects();
 
     for (auto &ent : entities) {
-      if (&entity == ent.get() || !ent->isAlive())
+      if (&entity == ent.get() ||
+          !ent->isAlive()) { // change this as we compare
+                             // the adresse of a
+                             // reference
         continue;
-      inter = entity.intersects(ent);
+      }
+      inter = this->intersectionCalculator.testIntersection(entity.getBody(),
+                                                            ent->getBody());
       if (inter.intersects) {
         entity.impact(ent, inter);
         return true;
@@ -41,7 +45,8 @@ bool Grid::checkCollision(Movable &entity) {
     for (auto &ent : updatableEntities) {
       if (&entity == ent.get() || !ent->isAlive())
         continue;
-      inter = entity.intersects(ent);
+      inter = this->intersectionCalculator.testIntersection(entity.getBody(),
+                                                            ent->getBody());
       if (inter.intersects) {
         entity.impact(ent, inter);
         return true;

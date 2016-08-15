@@ -13,8 +13,9 @@ Map::Map(const ACvar &cvarList)
            std::stoi(cvarList.getCvar("sv_mapY"))) {
   this->tileMap = {{{static_cast<int>(EntityId::WallFull),
                      static_cast<int>(EntityId::WallSquare), 0}}};
-  this->entitySpawner = {[this](const sf::Sprite &sprite, int posX, int posY) {
-    std::shared_ptr<Entity> ptr(new Wall(sprite));
+  this->entitySpawner = {[this](const EntityBody &body,
+                                const sf::Sprite &sprite, int posX, int posY) {
+    std::shared_ptr<Entity> ptr(new Wall(body, sprite));
 
     this->grid.getCell(posX, posY).addObject(ptr);
     return ptr;
@@ -91,10 +92,9 @@ void Map::convert(std::vector<std::vector<Maze::MazeElement>> mazeData,
         if (it == this->tileMap.end())
           continue;
         auto object = this->entitySpawner[static_cast<int>(it->spawnerPos)](
+            tileManager.getEntityBody(elem.value),
             tileManager.getTile(elem.value), x, y);
 
-        object->setSpriteCollisionObject(
-            tileManager.getSpriteCollisionObject(elem.value));
         object->setPosition({static_cast<float>(x * tileSize + tileSize / 2),
                              static_cast<float>(y * tileSize + tileSize / 2)});
       }
@@ -113,13 +113,12 @@ void Map::createPlayer(const TileManager &tileManager,
   int tileSize = tileManager.getTileSize();
 
   std::shared_ptr<Movable> player(
-      new Player(tileManager.getTile(EntityId::Tank), actionAnalyzer,
-                 tileManager.getSpriteCollisionObject(EntityId::Ball),
+      new Player(tileManager.getEntityBody(EntityId::Tank),
+                 tileManager.getTile(EntityId::Tank), actionAnalyzer,
+                 tileManager.getEntityBody(EntityId::Ball),
                  tileManager.getTile(EntityId::Ball)));
 
   this->grid.getCell(1, 1).addObject(player);
-  player->setSpriteCollisionObject(
-      tileManager.getSpriteCollisionObject(EntityId::Tank));
   player->setPosition({static_cast<float>(tileSize + tileSize / 2),
                        static_cast<float>(tileSize + tileSize / 2)});
 }

@@ -5,7 +5,7 @@
 
 class Wall : public Entity {
 public:
-  Wall(const sf::Sprite &sprite);
+  Wall(const EntityBody &body, const sf::Sprite &sprite);
 
   ~Wall() = default;
   Wall(const Wall &other) = default;

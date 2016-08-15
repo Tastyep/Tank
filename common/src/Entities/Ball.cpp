@@ -4,8 +4,8 @@
 #include "Grid.hh"
 #include <iostream>
 
-Ball::Ball(const sf::Sprite &sprite)
-    : Movable(sprite), bounceCount(0), maxBounce(5) {}
+Ball::Ball(const EntityBody &body, const sf::Sprite &sprite)
+    : Movable(body, sprite), bounceCount(0), maxBounce(5) {}
 
 void Ball::displace(int side, std::chrono::nanoseconds time, Grid &grid) {
   sf::Vector2f displacement;

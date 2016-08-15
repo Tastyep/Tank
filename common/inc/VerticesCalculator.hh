@@ -2,19 +2,13 @@
 #define TANK_VERTICESCALCULATOR_HH
 
 #include "Position.hpp"
+#include "Rectangle.hh"
 #include "Triangulation.hh"
 #include <SFML/Graphics.hpp>
 #include <array>
 #include <cmath>
+#include <iostream>
 #include <vector>
-
-struct intersectionResult {
-  bool intersects;
-  sf::Vector2f faceNormal;
-  float distance;
-
-  intersectionResult(bool intersects = true) : intersects(intersects) {}
-};
 
 class VerticesCalculator {
 private:
@@ -23,45 +17,21 @@ private:
 
 public:
   VerticesCalculator() = default;
-  VerticesCalculator(const sf::Sprite &sprite, float maxFaceAngle = 10);
+  VerticesCalculator(float maxFaceAngle = 10);
 
   ~VerticesCalculator() = default;
   VerticesCalculator(const VerticesCalculator &other) = default;
   VerticesCalculator(VerticesCalculator &&other) = default;
-  VerticesCalculator &operator=(const VerticesCalculator &other) {
-    this->previousStep = other.previousStep;
-    this->nextStep = other.nextStep;
-    this->directions = other.directions;
-    this->data = other.data;
-    this->bound = other.bound;
-    this->contour = other.contour;
-    this->vertices = other.vertices;
-    this->position = other.position;
-    this->polygons = other.polygons;
-    return *this;
-  };
-  VerticesCalculator &operator=(VerticesCalculator &&other) {
-    this->previousStep = other.previousStep;
-    this->nextStep = other.nextStep;
-    this->directions = other.directions;
-    this->data = other.data;
-    this->bound = other.bound;
-    this->contour = other.contour;
-    this->vertices = other.vertices;
-    this->position = other.position;
-    this->polygons = other.polygons;
-    return *this;
-  };
+  VerticesCalculator &operator=(const VerticesCalculator &other) = default;
+  VerticesCalculator &operator=(VerticesCalculator &&other) = default;
 
-  void computeVertices();
-  const std::vector<Position> &getVertices() const;
-  void move(const sf::Vector2f &displacement);
-  void setPosition(const Position &pos);
-  void rotate(double angle);
-  intersectionResult intersects(const std::vector<Polygon> &polygons) const;
+  void computeVertices(const sf::Sprite &sprite);
   const std::vector<Polygon> &getPolygons() const;
+  const Rectangle &getSpriteBound() const;
 
 private:
+  void init();
+  void computeSpriteBound();
   sf::Vector2i findStartPoint();
   void walkPerimeter(int x, int y);
   void step(int x, int y);
@@ -73,13 +43,6 @@ private:
   void triangulate();
   void mergeTriangles(std::vector<Polygon> &polygons);
   void allignOnSprite(int x, int y);
-  float dot(const sf::Vector2f &a, const sf::Vector2f &b) const;
-  void normalize(sf::Vector2f &vec) const;
-  void projectPolygon(const sf::Vector2f &faceNormal,
-                      const std::vector<Position> &vertices, float &min,
-                      float &max) const;
-  intersectionResult intersects(const Polygon &polygonA,
-                                const Polygon &polygonB) const;
 
 private:
   float maxFaceAngle;
@@ -90,9 +53,9 @@ private:
   std::vector<Position> vertices;
   sf::Image data;
   sf::IntRect bound;
-  Position position;
   Triangulation triangulation;
   std::vector<Polygon> polygons;
+  Rectangle spriteBound;
 };
 
 #endif /* end of include guard: TANK_VERTICESCALCULATOR_HH */

@@ -2,8 +2,10 @@
 #include "Grid.hh"
 #include <iostream>
 
-Movable::Movable(const sf::Sprite &sprite, double maxVelocity)
-    : Entity(sprite), maxVelocity(maxVelocity), velocity(0), acceleration(0) {
+Movable::Movable(const EntityBody &body, const sf::Sprite &sprite,
+                 double maxVelocity)
+    : Entity(body, sprite), maxVelocity(maxVelocity), velocity(0),
+      acceleration(0) {
   this->direction.x = std::cos(this->angle * radianConvert);
   this->direction.y = -std::sin(this->angle * radianConvert);
 }
@@ -38,7 +40,7 @@ void Movable::displace(int side, std::chrono::nanoseconds time, Grid &grid) {
 
 void Movable::draw(sf::RenderTarget &renderTarget) const {
   renderTarget.draw(this->sprite);
-  const auto &polygons = spriteBound.getVerticesCalculator().getPolygons();
+  const auto &polygons = this->body.getPolygons();
   sf::VertexArray varray(sf::LinesStrip);
 
   for (auto &polygon : polygons) {

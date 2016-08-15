@@ -4,18 +4,9 @@
 #include <stdexcept>
 
 #include <iostream>
-VerticesCalculator::VerticesCalculator(const sf::Sprite &sprite,
-                                       float maxFaceAngle)
+VerticesCalculator::VerticesCalculator(float maxFaceAngle)
     : maxFaceAngle(maxFaceAngle), previousStep(StepDirection::None),
       nextStep(StepDirection::None) {
-  const sf::Texture *texture = sprite.getTexture();
-  this->bound = sprite.getTextureRect();
-
-  this->data = texture->copyToImage();
-  /*
-  12
-  48
-  */
   this->directions = {StepDirection::None, StepDirection::N, StepDirection::E,
                       StepDirection::E,    StepDirection::W, StepDirection::N,
                       StepDirection::None, StepDirection::E, StepDirection::S,
@@ -24,24 +15,69 @@ VerticesCalculator::VerticesCalculator(const sf::Sprite &sprite,
                       StepDirection::None};
 }
 
-void VerticesCalculator::computeVertices() {
-  sf::Vector2i start = this->findStartPoint();
+void VerticesCalculator::init() {
+  this->previousStep = StepDirection::None;
+  this->nextStep = StepDirection::None;
+  this->contour.clear();
+  this->vertices.clear();
+  this->polygons.clear();
+}
 
+void VerticesCalculator::computeVertices(const sf::Sprite &sprite) {
+  const sf::Texture *texture = sprite.getTexture();
+  sf::Vector2i start;
+
+  this->init();
+  this->bound = sprite.getTextureRect();
+  this->data = texture->copyToImage();
+  this->computeSpriteBound();
+
+  start = this->findStartPoint();
   this->walkPerimeter(start.x, start.y);
-  this->removeSteps();
+  // this->removeSteps();
   this->polygonize();
   Polygon polygon(this->vertices);
 
   if (polygon.isConvex()) {
-    std::cout << "isConvex"
-              << "\n";
     this->polygons.push_back(polygon);
     this->vertices.clear();
   } else {
-    std::cout << "Not convex"
-              << "\n";
     this->triangulate();
   }
+}
+
+void VerticesCalculator::computeSpriteBound() {
+  sf::Color pixel;
+
+  // init so br is tl & tl is br
+  Position tl(this->bound.width, this->bound.height);
+  Position br(0, 0);
+  Position origin = Position(static_cast<float>(this->bound.width) / 2.f,
+                             static_cast<float>(this->bound.height) / 2.f);
+  for (int ty = 0; ty < this->bound.height; ++ty) {
+    for (int tx = 0; tx < this->bound.width; ++tx) {
+      if (this->isPixelSolid(
+              tx, ty)) { // Not Transparent, function auto adds the offset
+        pixel =
+            this->data.getPixel(tx + this->bound.left, ty + this->bound.top);
+
+        if (ty < tl.y)
+          tl.y = ty;
+        if (ty > br.y)
+          br.y = ty;
+        if (tx < tl.x)
+          tl.x = tx;
+        if (tx > br.x)
+          br.x = tx;
+      }
+    }
+  }
+  tl.x -= origin.x;
+  tl.y -= origin.y;
+  br.x -= origin.x;
+  br.y -= origin.y;
+  this->spriteBound = Rectangle(tl, br);
+  this->spriteBound.setInternTranslation({tl.x, tl.y});
 }
 
 void VerticesCalculator::mergeTriangles(std::vector<Polygon> &polygons) {
@@ -356,123 +392,10 @@ bool VerticesCalculator::isPixelSolid(int x, int y, bool out) const {
   return (this->data.getPixel(x + bound.left, y + bound.top).a > 10);
 }
 
-void VerticesCalculator::move(const sf::Vector2f &displacement) {
-  this->position.x += displacement.x;
-  this->position.y += displacement.y;
-  for (auto &polygon : this->polygons) {
-    polygon.move(displacement);
-  }
-}
-
-float VerticesCalculator::dot(const sf::Vector2f &a,
-                              const sf::Vector2f &b) const {
-  return a.x * b.x + a.y * b.y;
-}
-
-void VerticesCalculator::projectPolygon(const sf::Vector2f &faceNormal,
-                                        const std::vector<Position> &vertices,
-                                        float &min, float &max) const {
-  float dotProduct;
-
-  for (const auto &edge : vertices) {
-    // To project a point on an axis use the dot product
-    dotProduct = faceNormal.x * edge.x + faceNormal.y * edge.y;
-
-    if (dotProduct < min)
-      min = dotProduct;
-    if (dotProduct > max)
-      max = dotProduct;
-  }
-}
-
-intersectionResult
-VerticesCalculator::intersects(const Polygon &polygonA,
-                               const Polygon &polygonB) const {
-  intersectionResult result;
-  float intervalDistance;
-  float minIntervalDistance = std::numeric_limits<float>::max();
-  const auto &verticesA = polygonA.getVertices();
-  const auto &verticesB = polygonB.getVertices();
-  const auto &axisA = polygonA.getAxis();
-  const auto &axisB = polygonB.getAxis();
-
-  for (int pId = 0; pId < 2; ++pId) {
-    const auto &axis = (pId == 0 ? axisA : axisB);
-
-    for (const auto &ax : axis) {
-      float minA = std::numeric_limits<double>::max();
-      float minB = std::numeric_limits<double>::max();
-      float maxA = std::numeric_limits<double>::min();
-      float maxB = std::numeric_limits<double>::min();
-
-      this->projectPolygon(ax, verticesA, minA, maxA);
-      this->projectPolygon(ax, verticesB, minB, maxB);
-
-      if (minA > maxB || minB > maxA) { // Doesn't Overlaps
-        result.intersects = false;
-        return result;
-      } else {
-        intervalDistance = std::min(maxA, maxB) - std::max(minA, minB);
-        std::cout << ax.x << " " << ax.y << " " << intervalDistance << " "
-                  << minIntervalDistance << "\n";
-        if (intervalDistance < minIntervalDistance) {
-          minIntervalDistance = intervalDistance;
-          result.faceNormal = ax;
-          result.distance = intervalDistance;
-        }
-      }
-    }
-  }
-  return result;
-}
-
-intersectionResult
-VerticesCalculator::intersects(const std::vector<Polygon> &polygons) const {
-  bool intersects = false;
-  intersectionResult inter;
-  intersectionResult save(false);
-
-  std::cout << "TEST INTERSECTION"
-            << "\n";
-  for (const Polygon &polygonA : this->polygons) {
-    for (const Polygon &polygonB : polygons) {
-      inter = this->intersects(polygonA, polygonB);
-
-      if (inter.intersects && intersects == false) {
-        intersects = true;
-        save = inter;
-      }
-    }
-  }
-
-  return save;
-}
-
-void VerticesCalculator::setPosition(const Position &pos) {
-  Position allignedPos = pos;
-  this->position = pos;
-
-  allignedPos.x -= this->bound.width / 2;
-  allignedPos.y -= this->bound.height / 2;
-  for (auto &polygon : this->polygons) {
-    polygon.setPosition(allignedPos);
-  }
-}
-
-void VerticesCalculator::rotate(double angle) {
-  angle *= (VerticesCalculator::pi / 180.f);
-  double cs = std::cos(angle);
-  double sn = std::sin(angle);
-
-  for (auto &polygon : this->polygons) {
-    polygon.rotate(cs, sn, this->position);
-  }
-}
-
-const std::vector<Position> &VerticesCalculator::getVertices() const {
-  return this->vertices;
-}
-
 const std::vector<Polygon> &VerticesCalculator::getPolygons() const {
   return this->polygons;
+}
+
+const Rectangle &VerticesCalculator::getSpriteBound() const {
+  return this->spriteBound;
 }

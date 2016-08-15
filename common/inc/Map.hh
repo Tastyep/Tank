@@ -44,8 +44,8 @@ private:
   Maze maze;
   Grid grid;
   std::vector<TileData> tileMap;
-  std::vector<std::function<std::shared_ptr<Entity>(const sf::Sprite &sprite,
-                                                    int posX, int posY)>>
+  std::vector<std::function<std::shared_ptr<Entity>(
+      const EntityBody &body, const sf::Sprite &sprite, int posX, int posY)>>
       entitySpawner;
 };
 

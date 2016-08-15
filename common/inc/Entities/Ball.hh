@@ -7,7 +7,7 @@ class Wall;
 
 class Ball : public Movable {
 public:
-  Ball(const sf::Sprite &sprite);
+  Ball(const EntityBody &body, const sf::Sprite &sprite);
 
   ~Ball() = default;
   Ball(const Ball &other) = default;

@@ -2,6 +2,7 @@
 #define TANK_GRID_HH
 
 #include "Cell.hh"
+#include "IntersectionCalculator.hh"
 #include <queue>
 
 class Grid {
@@ -28,6 +29,7 @@ private:
   std::vector<std::vector<Cell>> cells;
   std::queue<std::shared_ptr<Entity>> objects;
   std::queue<std::shared_ptr<Movable>> movableObjects;
+  IntersectionCalculator intersectionCalculator;
 };
 
 #endif /* end of include guard: TANK_GRID_HH */

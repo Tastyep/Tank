@@ -3,7 +3,6 @@
 
 #include "IActionAnalyzer.hpp"
 #include "Movable.hh"
-#include "SpriteCollision.hh"
 #include <cmath>
 
 class Player : public Movable {
@@ -11,8 +10,9 @@ private:
   static constexpr double alpha = 5;
 
 public:
-  Player(const sf::Sprite &sprite, IActionAnalyzer &actionAnalyzer,
-         const SpriteCollision &ballSpriteBound, const sf::Sprite &ballSprite);
+  Player(const EntityBody &body, const sf::Sprite &sprite,
+         IActionAnalyzer &actionAnalyzer, const EntityBody &ballBody,
+         const sf::Sprite &ballSprite);
 
   ~Player() = default;
   Player(const Player &other) = default;
@@ -30,7 +30,7 @@ private:
 
 private:
   IActionAnalyzer &actionAnalyzer;
-  const SpriteCollision &ballSpriteBound;
+  const EntityBody &ballBody;
   const sf::Sprite &ballSprite;
 };
 
