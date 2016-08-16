@@ -3,7 +3,6 @@
 
 #include "Polygon.hh"
 #include "Rectangle.hh"
-#include <SFML/Graphics.hpp>
 #include <vector>
 
 class EntityBody {
@@ -16,6 +15,8 @@ public:
   EntityBody(EntityBody &&other) = default;
   EntityBody &operator=(const EntityBody &other) = default;
   EntityBody &operator=(EntityBody &&other) = default;
+
+  void draw(sf::RenderTarget &renderTarget) const;
 
   void move(const sf::Vector2f &displacement);
   void setPosition(const Position &pos);

@@ -15,6 +15,18 @@ Position &Polygon::operator[](int idx) {
   return this->vertices[idx % this->vertices.size()];
 }
 
+void Polygon::draw(sf::RenderTarget &renderTarget) const {
+  sf::VertexArray varray(sf::LinesStrip);
+
+  for (const auto &vertice : this->vertices) {
+    varray.append(sf::Vertex(sf::Vector2f(vertice.x, vertice.y),
+                             sf::Color(255, 255, 255)));
+  }
+  varray.append(sf::Vertex(sf::Vector2f(vertices.front().x, vertices.front().y),
+                           sf::Color(255, 255, 255)));
+  renderTarget.draw(varray);
+}
+
 bool Polygon::hasFace(const Position &a, const Position &b) const {
   int verticeIdx = this->getVerticeIdx(a);
 

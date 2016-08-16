@@ -7,6 +7,24 @@ EntityBody::EntityBody(const std::vector<Polygon> &polygons,
     : polygons(polygons), spriteBound(spriteBound), textureBound(textureBound) {
 }
 
+void EntityBody::draw(sf::RenderTarget &renderTarget) const {
+  sf::VertexArray varray(sf::LinesStrip);
+
+  for (auto &polygon : this->polygons) {
+    const std::vector<Position> &vertices = polygon.getVertices();
+
+    for (const auto &vertice : vertices) {
+      varray.append(sf::Vertex(sf::Vector2f(vertice.x, vertice.y),
+                               sf::Color(255, 255, 255)));
+    }
+    varray.append(
+        sf::Vertex(sf::Vector2f(vertices.front().x, vertices.front().y),
+                   sf::Color(255, 255, 255)));
+  }
+  renderTarget.draw(varray);
+  // this->spriteBound.draw(renderTarget);
+}
+
 void EntityBody::move(const sf::Vector2f &displacement) {
   this->position.x += displacement.x;
   this->position.y += displacement.y;

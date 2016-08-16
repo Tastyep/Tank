@@ -2,6 +2,7 @@
 #define TANK_POLYGON_HH
 
 #include "Position.hpp"
+#include <SFML/Graphics.hpp>
 #include <utility>
 #include <vector>
 
@@ -47,6 +48,8 @@ public:
     /* Not implemented */
     return false;
   };
+
+  void draw(sf::RenderTarget &renderTarget) const;
 
   bool isConvex() const;
   const std::vector<Position> &getOriginVertices() const;

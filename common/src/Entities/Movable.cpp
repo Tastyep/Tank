@@ -40,20 +40,7 @@ void Movable::displace(int side, std::chrono::nanoseconds time, Grid &grid) {
 
 void Movable::draw(sf::RenderTarget &renderTarget) const {
   renderTarget.draw(this->sprite);
-  const auto &polygons = this->body.getPolygons();
-  sf::VertexArray varray(sf::LinesStrip);
-
-  for (auto &polygon : polygons) {
-    std::vector<Position> vertices = polygon.getVertices();
-
-    vertices.push_back(vertices.front());
-    for (const auto &vertice : vertices) {
-      varray.append(sf::Vertex(sf::Vector2f(vertice.x, vertice.y),
-                               sf::Color(255, 255, 255)));
-    }
-  }
-
-  renderTarget.draw(varray);
+  this->body.draw(renderTarget);
 }
 
 void Movable::setDirection(const sf::Vector2f direction) {

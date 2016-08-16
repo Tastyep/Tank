@@ -10,30 +10,7 @@ intersectionResult Wall::intersects(const Entity &ent) const {
 }
 void Wall::draw(sf::RenderTarget &renderTarget) const {
   renderTarget.draw(this->sprite);
-  const auto &polygons = this->body.getPolygons();
-  sf::VertexArray varray(sf::LinesStrip);
-
-  for (auto &polygon : polygons) {
-    std::vector<Position> vertices = polygon.getVertices();
-
-    vertices.push_back(vertices.front());
-    for (const auto &vertice : vertices) {
-      varray.append(sf::Vertex(sf::Vector2f(vertice.x, vertice.y),
-                               sf::Color(255, 255, 255)));
-    }
-  }
-
-  renderTarget.draw(varray);
-  // auto edges = this->spriteBound.getBound().getEdges();
-  //
-  // sf::ConvexShape convex(4);
-  // for (unsigned int i = 0; i < edges.size(); ++i) {
-  //   convex.setPoint(i, sf::Vector2f(edges[i].x, edges[i].y));
-  // }
-  // convex.setFillColor(sf::Color(0, 0, 0, 0));
-  // convex.setOutlineColor(sf::Color(255, 255, 255));
-  // convex.setOutlineThickness(1);
-  // renderTarget.draw(convex);
+  this->body.draw(renderTarget);
 }
 
 void Wall::getImpacted(Entity &entity, const intersectionResult &inter) {}
