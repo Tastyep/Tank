@@ -9,22 +9,6 @@ Polygon::Polygon(const std::vector<Position> &vertices)
   this->computeAxis();
 }
 
-Polygon::Polygon(const Polygon &other) {
-  this->vertices = other.vertices;
-  this->originVertices = other.originVertices;
-  this->translation = other.translation;
-  this->axis = other.axis;
-};
-
-void Polygon::operator=(const std::vector<Position> &vertices) {
-  this->vertices = vertices;
-  this->originVertices = vertices;
-  this->axis.clear();
-  this->axis.resize(this->vertices.size());
-  this->computeTranslation();
-  this->computeAxis();
-};
-
 Position &Polygon::operator[](int idx) {
   if (idx < 0)
     idx += this->vertices.size();
@@ -145,7 +129,3 @@ void Polygon::computeAxis() {
 }
 
 const std::vector<sf::Vector2f> &Polygon::getAxis() const { return this->axis; }
-
-Position Polygon::getPosition() const {
-  return this->position + this->translation;
-}

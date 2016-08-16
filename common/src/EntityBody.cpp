@@ -36,7 +36,7 @@ void EntityBody::rotate(double angle) {
   for (auto &polygon : this->polygons) {
     polygon.rotate(cs, sn, this->position);
   }
-  this->spriteBound.rotate(angle);
+  this->spriteBound.rotate(cs, sn, this->position);
 }
 
 const Rectangle &EntityBody::getBound() const { return this->spriteBound; }

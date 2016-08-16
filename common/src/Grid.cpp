@@ -10,7 +10,7 @@ Grid::Grid(int width, int height) : width(width), height(height) {
 
 bool Grid::checkCollision(Movable &entity) {
   const Rectangle &rect = entity.getBody().getBound();
-  const auto &edges = rect.getEdges();
+  const auto &edges = rect.getVertices();
   std::array<Position, 4> cellPositions;
   unsigned int includeCells = 0;
   intersectionResult inter;

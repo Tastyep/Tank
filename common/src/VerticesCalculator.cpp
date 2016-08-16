@@ -77,7 +77,6 @@ void VerticesCalculator::computeSpriteBound() {
   br.x -= origin.x;
   br.y -= origin.y;
   this->spriteBound = Rectangle(tl, br);
-  this->spriteBound.setInternTranslation({tl.x, tl.y});
 }
 
 void VerticesCalculator::mergeTriangles(std::vector<Polygon> &polygons) {

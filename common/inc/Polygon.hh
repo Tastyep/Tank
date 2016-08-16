@@ -2,6 +2,7 @@
 #define TANK_POLYGON_HH
 
 #include "Position.hpp"
+#include <utility>
 #include <vector>
 
 class Polygon {
@@ -10,8 +11,35 @@ public:
   Polygon(const std::vector<Position> &vertices);
 
   ~Polygon() = default;
-  Polygon(const Polygon &other);
-  void operator=(const std::vector<Position> &vertices);
+  Polygon(const Polygon &other) {
+    this->vertices = other.vertices;
+    this->originVertices = other.originVertices;
+    this->axis = other.axis;
+    this->translation = other.translation;
+  }
+  Polygon &operator=(const std::vector<Position> &vertices) {
+    this->vertices = vertices;
+    this->originVertices = vertices;
+    this->axis.clear();
+    this->axis.resize(this->vertices.size());
+    this->computeTranslation();
+    this->computeAxis();
+    return *this;
+  }
+  Polygon &operator=(const Polygon &other) {
+    this->vertices = other.vertices;
+    this->originVertices = other.originVertices;
+    this->axis = other.axis;
+    this->translation = other.translation;
+    return *this;
+  }
+  Polygon &operator=(Polygon &&other) {
+    this->vertices = std::move(other.vertices);
+    this->originVertices = std::move(other.originVertices);
+    this->axis = std::move(other.axis);
+    this->translation = other.translation;
+    return *this;
+  }
 
   Position &operator[](int idx);
 
@@ -40,7 +68,6 @@ protected:
   std::vector<Position> vertices;
   std::vector<Position> originVertices;
   std::vector<sf::Vector2f> axis;
-  Position position;
   sf::Vector2f translation;
 };
 
