@@ -1,5 +1,7 @@
 #include "Cell.hh"
 #include <algorithm>
+#include <iterator>
+#include <utility>
 
 void Cell::removeObject(const Position &pos) {
   auto it = std::find_if(this->objects.begin(), this->objects.end(),
@@ -19,6 +21,25 @@ void Cell::addObject(std::shared_ptr<Entity> object) {
 
 void Cell::addObject(std::shared_ptr<Movable> object) {
   this->movableObjects.push_back(object);
+}
+
+void Cell::removeObject(std::shared_ptr<Entity> object) {
+  auto it = std::find(this->objects.begin(), this->objects.end(), object);
+
+  if (it != this->objects.end()) {
+    std::swap(*it, this->objects.back());
+    this->objects.pop_back();
+  }
+}
+
+void Cell::removeObject(std::shared_ptr<Movable> object) {
+  auto it = std::find(this->movableObjects.begin(), this->movableObjects.end(),
+                      object);
+
+  if (it != this->movableObjects.end()) {
+    std::swap(*it, this->movableObjects.back());
+    this->movableObjects.pop_back();
+  }
 }
 
 const std::vector<std::shared_ptr<Entity>> &Cell::getObjects() {

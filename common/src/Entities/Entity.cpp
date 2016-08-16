@@ -19,12 +19,6 @@ void Entity::setPosition(Position pos) {
   this->body.setPosition(pos);
 }
 
-void Entity::move(const sf::Vector2f &displacement) {
-  this->sprite.move(displacement);
-  this->position += displacement;
-  this->body.move(displacement);
-}
-
 void Entity::applyRotation(double angle) {
   this->angle += angle;
   if (this->angle >= 360)

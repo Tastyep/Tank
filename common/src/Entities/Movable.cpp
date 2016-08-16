@@ -23,8 +23,15 @@ void Movable::rotate(double angle, Grid &grid) {
   this->direction.y = -std::sin(radianAngle);
 }
 
+void Movable::move(const sf::Vector2f &displacement) {
+  this->sprite.move(displacement);
+  this->position += displacement;
+  this->body.move(displacement);
+}
+
 void Movable::displace(int side, std::chrono::nanoseconds time, Grid &grid) {
   sf::Vector2f displacement;
+  Position savePos = this->position;
 
   this->acceleration = side;
   this->velocity = std::min(this->velocity + this->acceleration * time.count(),
@@ -36,6 +43,9 @@ void Movable::displace(int side, std::chrono::nanoseconds time, Grid &grid) {
   this->move(displacement);
   if (grid.checkCollision(*this) == true)
     this->move(-displacement);
+  else {
+    grid.moveObject(shared_from_base<Movable>(), savePos, this->position);
+  }
 }
 
 void Movable::draw(sf::RenderTarget &renderTarget) const {

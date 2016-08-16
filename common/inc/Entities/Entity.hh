@@ -12,7 +12,7 @@
 class Ball;
 class Player;
 
-class Entity {
+class Entity : public std::enable_shared_from_this<Entity> {
 public:
   static constexpr auto pi = std::acos(-1);
   static constexpr double radianConvert = (pi / 180.0);
@@ -34,12 +34,16 @@ public:
   const Position &getPosition() const;
   const sf::Sprite &getSprite() const;
   void setPosition(Position pos);
-  void move(const sf::Vector2f &displacement);
   void applyRotation(double angle);
   void setBody(const EntityBody &body);
   const EntityBody &getBody() const;
   bool isAlive() const;
   void setDead();
+
+protected:
+  template <typename Derived> std::shared_ptr<Derived> shared_from_base() {
+    return std::static_pointer_cast<Derived>(shared_from_this());
+  }
 
 protected:
   EntityBody body;

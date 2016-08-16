@@ -23,6 +23,8 @@ public:
   void removeObject(const Position &pos);
   void addObject(std::shared_ptr<Entity> object);
   void addObject(std::shared_ptr<Movable> object);
+  void removeObject(std::shared_ptr<Entity> object);
+  void removeObject(std::shared_ptr<Movable> object);
 
   void update(Grid &grid, std::chrono::nanoseconds time);
 

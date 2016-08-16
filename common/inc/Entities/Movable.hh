@@ -25,6 +25,7 @@ public:
 protected:
   virtual void displace(int side, std::chrono::nanoseconds time, Grid &grid);
   void rotate(double angle, Grid &grid);
+  void move(const sf::Vector2f &displacement);
 
 protected:
   double maxVelocity;

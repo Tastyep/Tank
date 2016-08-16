@@ -64,12 +64,33 @@ bool Grid::checkCollision(Movable &entity) {
   return false;
 }
 
+unsigned int Grid::getCellId(const Position &pos) const {
+  return (static_cast<int>(pos.y) / 32) * this->width +
+         (static_cast<int>(pos.x) / 32);
+}
+
 int Grid::getHeight() const { return this->height; }
 
 int Grid::getWidth() const { return this->width; }
 
 Cell &Grid::getCell(int x, int y) { return this->cells[y][x]; }
+Cell &Grid::getCell(unsigned int cellId) {
+  return this->cells[cellId / this->width][cellId % this->width];
+}
 
+Cell &Grid::operator[](unsigned int cellId) { return this->getCell(cellId); }
+
+void Grid::moveObject(std::shared_ptr<Movable> object, const Position &oldPos,
+                      const Position &newPos) {
+  unsigned int cellIdA, cellIdB;
+
+  cellIdA = this->getCellId(oldPos);
+  cellIdB = this->getCellId(newPos);
+
+  if (cellIdA != cellIdB) {
+    this->moveQueue.emplace(cellIdA, cellIdB, object);
+  }
+}
 void Grid::addObjectToQueue(std::shared_ptr<Entity> object) {
   this->objects.push(object);
 }
@@ -84,8 +105,9 @@ void Grid::processQueue() {
     const auto &bound = object->getSprite().getGlobalBounds();
     const Position &position = object->getPosition();
 
-    this->getCell(position.x / bound.width, position.y / bound.height)
-        .addObject(object);
+    Cell &cell =
+        this->getCell(position.x / bound.width, position.y / bound.height);
+    cell.addObject(object);
     this->objects.pop();
   }
   while (!this->movableObjects.empty()) {
@@ -93,8 +115,18 @@ void Grid::processQueue() {
     const auto &bound = object->getSprite().getGlobalBounds();
     const Position &position = object->getPosition();
 
-    this->getCell(position.x / bound.width, position.y / bound.height)
-        .addObject(object);
+    Cell &cell =
+        this->getCell(position.x / bound.width, position.y / bound.height);
+    cell.addObject(object);
     this->movableObjects.pop();
+  }
+  while (!this->moveQueue.empty()) {
+    const MoveInfo &moveInfo = this->moveQueue.front();
+    Cell &cellFrom = this->getCell(moveInfo.cellFrom);
+    Cell &cellTo = this->getCell(moveInfo.cellTo);
+
+    cellFrom.removeObject(moveInfo.object);
+    cellTo.addObject(moveInfo.object);
+    this->moveQueue.pop();
   }
 }
