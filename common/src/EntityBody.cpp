@@ -21,8 +21,8 @@ void EntityBody::draw(sf::RenderTarget &renderTarget) const {
         sf::Vertex(sf::Vector2f(vertices.front().x, vertices.front().y),
                    sf::Color(255, 255, 255)));
   }
-  renderTarget.draw(varray);
-  // this->spriteBound.draw(renderTarget);
+  // renderTarget.draw(varray);
+  this->spriteBound.draw(renderTarget);
 }
 
 void EntityBody::move(const sf::Vector2f &displacement) {

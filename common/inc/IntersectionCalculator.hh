@@ -27,6 +27,8 @@ private:
   void projectPolygon(const sf::Vector2f &faceNormal,
                       const std::vector<Position> &vertices, float &min,
                       float &max) const;
+  bool testSimpleIntersection(const Polygon &polygonA,
+                              const Polygon &polygonB) const;
   intersectionResult intersects(const Polygon &polygonA,
                                 const Polygon &polygonB) const;
   intersectionResult intersects(const std::vector<Polygon> &polygonsA,

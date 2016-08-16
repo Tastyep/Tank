@@ -22,6 +22,33 @@ void IntersectionCalculator::projectPolygon(
   }
 }
 
+bool IntersectionCalculator::testSimpleIntersection(
+    const Polygon &polygonA, const Polygon &polygonB) const {
+  const auto &verticesA = polygonA.getVertices();
+  const auto &verticesB = polygonB.getVertices();
+  const auto &axisA = polygonA.getAxis();
+  const auto &axisB = polygonB.getAxis();
+
+  for (int pId = 0; pId < 2; ++pId) {
+    const auto &axis = (pId == 0 ? axisA : axisB);
+
+    for (const auto &ax : axis) {
+      float minA = std::numeric_limits<double>::max();
+      float minB = std::numeric_limits<double>::max();
+      float maxA = std::numeric_limits<double>::min();
+      float maxB = std::numeric_limits<double>::min();
+
+      this->projectPolygon(ax, verticesA, minA, maxA);
+      this->projectPolygon(ax, verticesB, minB, maxB);
+
+      if (minA > maxB || minB > maxA) { // Doesn't Overlaps
+        return false;
+      }
+    }
+  }
+  return true;
+}
+
 intersectionResult
 IntersectionCalculator::intersects(const Polygon &polygonA,
                                    const Polygon &polygonB) const {
@@ -89,5 +116,8 @@ intersectionResult IntersectionCalculator::intersects(
 intersectionResult
 IntersectionCalculator::testIntersection(const EntityBody &bodyA,
                                          const EntityBody &bodyB) const {
-  return this->intersects(bodyA.getPolygons(), bodyB.getPolygons());
+  if (this->testSimpleIntersection(bodyA.getBound(), bodyB.getBound())) {
+    return this->intersects(bodyA.getPolygons(), bodyB.getPolygons());
+  }
+  return intersectionResult(false);
 }
